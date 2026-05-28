@@ -9,10 +9,10 @@
 <body>
 <div id="app">
 <main class="main" style="margin-left:0;">
-  <div class="detail-hdr">
+  <div class="detail-hdr" style="display:flex;align-items:center;gap:12px;">
     <button class="back-btn" onclick="history.back()">←</button>
     <div><div class="dh-plate" id="dh-plate">—</div><div class="dh-model" id="dh-model">—</div></div>
-    <div style="margin-left:auto" id="dh-badge"></div>
+    <div id="dh-badge" style="margin-left:auto"></div><button onclick="Auth.logout()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;white-space:nowrap;">🚪 ออก</button>
   </div>
   <div class="tab-bar">
     <div class="tab active" onclick="showTab('info',this)">ข้อมูลรถ</div>

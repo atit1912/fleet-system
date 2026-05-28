@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เข้าสู่ระบบ — FleetSHE</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F5F7FA;
+  padding: 20px;
+}
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #E5E7EB;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 360px;
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.login-logo-icon { font-size: 36px; color: #1857A4; }
+.login-title { font-size: 18px; font-weight: 600; color: #1a1a1a; margin-top: 8px; }
+.login-sub   { font-size: 12px; color: #6B7280; margin-top: 4px; }
+.error-msg {
+  background: #FEF2F2;
+  color: #991B1B;
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  display: none;
+}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">&#9651;</div>
+      <div class="login-title">FleetSHE</div>
+      <div class="login-sub">ระบบบริหารรถยนต์หน่วยงาน</div>
+    </div>
+
+    <div class="error-msg" id="error-msg">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
+
+    <div class="form-group">
+      <label class="form-label">อีเมล</label>
+      <input type="email" id="email" class="form-input" placeholder="example@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">รหัสผ่าน</label>
+      <input type="password" id="password" class="form-input" placeholder="รหัสผ่าน" autocomplete="current-password">
+    </div>
+
+    <button class="btn btn-primary" onclick="doLogin()" id="login-btn">เข้าสู่ระบบ</button>
+
+    <div style="margin-top:16px; padding:12px; background:#EFF6FF; border-radius:8px; font-size:11px; color:#1E3A8A;">
+      <strong>ทดสอบระบบ:</strong><br>
+      admin@fleet.local / password123<br>
+      role: CENTER_ADMIN | ศูนย์หัวกุญแจ
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+  // ถ้า login แล้ว ไปหน้าหลักเลย
+  if (Auth.isLoggedIn()) window.location.href = 'index.html';
+
+  function doLogin() {
+    var email    = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var btn      = document.getElementById('login-btn');
+    var errEl    = document.getElementById('error-msg');
+
+    if (!email || !password) {
+      errEl.textContent = 'กรุณากรอกอีเมลและรหัสผ่าน';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.textContent = 'กำลังเข้าสู่ระบบ...';
+    btn.disabled = true;
+    errEl.style.display = 'none';
+
+    API.call('login', { email: email, password: password })
+      .then(function(res) {
+        if (res.success && res.user) {
+          Auth.setUser(res.user);
+          window.location.href = 'index.html';
+        } else {
+          // Demo login สำหรับทดสอบ
+          if (email === 'admin@fleet.local' && password === 'password123') {
+            Auth.setUser({
+              id: 'usr-001',
+              name: 'Admin หัวกุญแจ',
+              email: email,
+              role: 'CENTER_ADMIN',
+              centerId: 'ctr-hk',
+              centerName: 'ศูนย์วิจัยหัวกุญแจ'
+            });
+            window.location.href = 'index.html';
+          } else {
+            errEl.textContent = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+            errEl.style.display = 'block';
+            btn.textContent = 'เข้าสู่ระบบ';
+            btn.disabled = false;
+          }
+        }
+      })
+      .catch(function() {
+        // Fallback demo login
+        if (email === 'admin@fleet.local' && password === 'password123') {
+          Auth.setUser({
+            id: 'usr-001',
+            name: 'Admin หัวกุญแจ',
+            email: email,
+            role: 'CENTER_ADMIN',
+            centerId: 'ctr-hk',
+            centerName: 'ศูนย์วิจัยหัวกุญแจ'
+          });
+          window.location.href = 'index.html';
+        } else {
+          errEl.textContent = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+          errEl.style.display = 'block';
+          btn.textContent = 'เข้าสู่ระบบ';
+          btn.disabled = false;
+        }
+      });
+  }
+
+  // กด Enter login ได้เลย
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบบริหารรถยนต์หน่วยงาน</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+<div id="app">
+
+  <!-- SIDEBAR (desktop) -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">&#9651;</span>
+      <div>
+        <div class="logo-title">FleetSHE</div>
+        <div class="logo-sub">ระบบบริหารรถยนต์</div>
+      </div>
+    </div>
+    <a href="index.html"   class="nav-item active"><i class="icon">&#9632;</i> Dashboard</a>
+    <a href="vehicles.html" class="nav-item"><i class="icon">&#9650;</i> รถยนต์</a>
+    <a href="maintenance.html" class="nav-item"><i class="icon">&#9711;</i> บำรุงรักษา</a>
+    <a href="drivers.html"  class="nav-item"><i class="icon">&#9670;</i> ผู้ขับขี่</a>
+    <a href="service.html"  class="nav-item"><i class="icon">&#9632;</i> ประวัติซ่อม</a>
+    <a href="report.html"   class="nav-item"><i class="icon">&#9660;</i> รายงาน</a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-user" id="sidebar-user"></div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()" aria-label="เมนู">&#9776;</button>
+      <div class="topbar-title">ภาพรวมวันนี้</div>
+      <div class="topbar-right">
+        <select id="center-filter" onchange="loadDashboard()">
+          <option value="ALL">ทุกศูนย์</option>
+        </select>
+      </div>
+    </header>
+
+    <!-- KPI CARDS -->
+    <section class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-num" id="kpi-total">—</div>
+        <div class="kpi-label">รถทั้งหมด</div>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-num" id="kpi-overdue">—</div>
+        <div class="kpi-label">เกินกำหนด</div>
+      </div>
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-num" id="kpi-duesoon">—</div>
+        <div class="kpi-label">ใกล้ครบกำหนด</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-num" id="kpi-normal">—</div>
+        <div class="kpi-label">ปกติ</div>
+      </div>
+    </section>
+
+    <!-- URGENT LIST -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">รายการที่ต้องดำเนินการ</span>
+        <a href="vehicles.html" class="section-link">ดูทั้งหมด</a>
+      </div>
+      <div id="urgent-list" class="card-list">
+        <div class="loading">กำลังโหลด...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <a href="index.html"    class="bnav-item active"><span class="bnav-icon">&#9632;</span><span>หน้าหลัก</span></a>
+    <a href="vehicles.html" class="bnav-item"><span class="bnav-icon">&#9650;</span><span>รถยนต์</span></a>
+    <a href="maintenance.html" class="bnav-item"><span class="bnav-icon">&#9711;</span><span>บำรุงรักษา</span></a>
+    <a href="drivers.html"  class="bnav-item"><span class="bnav-icon">&#9670;</span><span>ผู้ขับขี่</span></a>
+    <a href="report.html"   class="bnav-item"><span class="bnav-icon">&#9660;</span><span>รายงาน</span></a>
+  </nav>
+
+</div>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+  // ─── Init ────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    requireAuth();
+    loadCenterFilter();
+    loadDashboard();
+  });
+
+  function loadCenterFilter() {
+    API.call('getCenters').then(function(res) {
+      if (!res.success) return;
+      var sel = document.getElementById('center-filter');
+      res.data.forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name;
+        sel.appendChild(opt);
+      });
+    });
+  }
+
+  function loadDashboard() {
+    var centerId = document.getElementById('center-filter').value;
+    API.call('getDashboard', { centerId: centerId }).then(function(res) {
+      if (!res.success) return;
+      var s = res.summary;
+      document.getElementById('kpi-total').textContent   = s.total;
+      document.getElementById('kpi-overdue').textContent = s.overdue;
+      document.getElementById('kpi-duesoon').textContent = s.dueSoon;
+      document.getElementById('kpi-normal').textContent  = s.normal + (s.appointed > 0 ? ' (+' + s.appointed + ' นัด)' : '');
+
+      renderUrgentList(res.urgentList);
+    });
+  }
+
+  function renderUrgentList(list) {
+    var el = document.getElementById('urgent-list');
+    if (!list || list.length === 0) {
+      el.innerHTML = '<div class="empty">ไม่มีรายการที่ต้องดำเนินการ</div>';
+      return;
+    }
+    el.innerHTML = list.map(function(item) {
+      var statusClass = item.status === 'OVERDUE' ? 'status-red' : 'status-amber';
+      var statusLabel = item.status === 'OVERDUE' ? 'เกินกำหนด' : 'ใกล้ครบกำหนด';
+      var meta = [];
+      if (item.remainingKm  != null) meta.push((item.remainingKm  < 0 ? 'เกิน ' + Math.abs(item.remainingKm)  : 'เหลือ ' + item.remainingKm)  + ' กม.');
+      if (item.remainingDays!= null) meta.push((item.remainingDays< 0 ? 'เกิน ' + Math.abs(item.remainingDays) : 'อีก '  + item.remainingDays) + ' วัน');
+      return '<a href="vehicle.html?id=' + item.vehicleId + '" class="vehicle-card border-' + (item.status === 'OVERDUE' ? 'red' : 'amber') + '">' +
+        '<div class="vc-row">' +
+          '<div><div class="vc-plate">' + item.plateNumber + '</div>' +
+          '<div class="vc-model">' + item.brand + ' ' + item.model + '</div></div>' +
+          '<span class="badge ' + statusClass + '">' + statusLabel + '</span>' +
+        '</div>' +
+        '<div class="vc-meta">' + meta.join(' · ') + '</div>' +
+        '<div class="vc-task">' + item.typeLabel + '</div>' +
+      '</a>';
+    }).join('');
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+</script>
+</body>
+</html>

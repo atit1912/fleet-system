@@ -1,81 +1,117 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>FleetSHE — เข้าสู่ระบบ</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FleetSHE&En — เข้าสู่ระบบ</title>
 <link rel="stylesheet" href="style.css">
 <style>
-body{background:linear-gradient(145deg,#0A2647 0%,#0F3460 60%,#1557A0 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0;}
-.login-wrap{width:100%;max-width:380px;position:relative;z-index:1;}
-.login-logo{text-align:center;margin-bottom:28px;animation:fadeUp .4s ease;}
-.logo-circle{width:64px;height:64px;background:linear-gradient(135deg,#3B8FE8,#1557A0);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px;box-shadow:0 8px 32px rgba(59,143,232,.5);}
-.login-title{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.02em;}
-.login-sub{font-size:13px;color:rgba(255,255,255,.45);margin-top:5px;}
-.login-card{background:rgba(255,255,255,.07);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px 24px;animation:fadeUp .4s .1s ease both;}
-.login-card .form-label{color:rgba(255,255,255,.7);}
-.login-card .form-input{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;font-size:15px;padding:13px 14px;}
-.login-card .form-input::placeholder{color:rgba(255,255,255,.3);}
-.login-card .form-input:focus{border-color:#3B8FE8;background:rgba(255,255,255,.12);box-shadow:0 0 0 3px rgba(59,143,232,.25);}
-.err-box{background:rgba(224,45,45,.15);border:1px solid rgba(224,45,45,.3);color:#FF8080;font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none;}
-.demo-box{margin-top:16px;padding:12px 14px;background:rgba(59,143,232,.1);border:1px solid rgba(59,143,232,.2);border-radius:8px;font-size:12px;color:rgba(255,255,255,.45);line-height:1.7;}
-.demo-box strong{color:rgba(255,255,255,.6);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+body{
+  background:linear-gradient(160deg,#03204F 0%,#043573 50%,#074DA0 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%,rgba(91,151,236,.15) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(11,94,215,.12) 0%,transparent 50%);
+  pointer-events:none;
+}
+.login-wrap{width:100%;max-width:400px;position:relative;z-index:1;}
+.login-logo{text-align:center;margin-bottom:32px;animation:fadeUp .4s ease;}
+.logo-ring{
+  width:72px;height:72px;margin:0 auto 16px;
+  background:linear-gradient(135deg,rgba(91,151,236,.3),rgba(11,94,215,.2));
+  border:1.5px solid rgba(255,255,255,.15);
+  border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;
+  box-shadow:0 8px 32px rgba(11,94,215,.4),inset 0 1px 0 rgba(255,255,255,.1);
+  backdrop-filter:blur(20px);
+}
+.logo-appname{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.02em;}
+.logo-tagline{font-size:13px;color:rgba(255,255,255,.45);margin-top:5px;}
+.login-card{
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:24px;padding:28px 24px;
+  animation:fadeUp .4s .1s ease both;
+  box-shadow:0 20px 60px rgba(3,32,79,.4);
+}
+.login-card .flabel{color:rgba(255,255,255,.7);}
+.login-card .finput{
+  background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);
+  color:#fff;font-size:15px;padding:13px 14px;
+}
+.login-card .finput::placeholder{color:rgba(255,255,255,.3);}
+.login-card .finput:focus{
+  border-color:rgba(91,151,236,.8);background:rgba(255,255,255,.12);
+  box-shadow:0 0 0 3px rgba(91,151,236,.2);
+}
+.err-box{
+  background:rgba(229,50,45,.15);border:1px solid rgba(229,50,45,.25);
+  color:#FF8080;font-size:13px;padding:10px 14px;
+  border-radius:10px;margin-bottom:16px;display:none;
+}
+.demo-box{
+  margin-top:16px;padding:13px 14px;
+  background:rgba(11,94,215,.15);border:1px solid rgba(91,151,236,.2);
+  border-radius:12px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.7;
+}
+.demo-box strong{color:rgba(255,255,255,.65);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
 <div class="login-wrap">
   <div class="login-logo">
-    <div class="logo-circle">🚗</div>
-    <div class="login-title">FleetSHE</div>
-    <div class="login-sub">ระบบบริหารจัดการรถยนต์หน่วยงาน</div>
+    <div class="logo-ring">🚗</div>
+    <div class="logo-appname">FleetSHE&En</div>
+    <div class="logo-tagline">ระบบบริหารจัดการรถยนต์หน่วยงาน</div>
   </div>
   <div class="login-card">
     <div class="err-box" id="err"></div>
-    <div class="form-group">
-      <label class="form-label">อีเมล</label>
-      <input type="email" id="email" class="form-input" placeholder="อีเมลของคุณ" autocomplete="email">
+    <div class="fgroup">
+      <label class="flabel">ชื่อผู้ใช้ หรือ อีเมล</label>
+      <input type="text" id="user" class="finput" placeholder="กรอก username หรืออีเมล" autocomplete="username">
     </div>
-    <div class="form-group">
-      <label class="form-label">รหัสผ่าน</label>
-      <input type="password" id="pass" class="form-input" placeholder="••••••••" autocomplete="current-password">
+    <div class="fgroup">
+      <label class="flabel">รหัสผ่าน</label>
+      <input type="password" id="pass" class="finput" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <button class="btn btn-primary btn-block btn-lg" id="btn" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <button class="btn btn-primary btn-full btn-lg" id="btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div class="demo-box">
-      <strong>ทดสอบระบบ</strong><br>admin / admin (รหัสอะไรก็ได้)<br>superadmin / superadmin<br>manager / manager
-      admin@fleet.local / password123<br>
-      superadmin@fleet.local / password123
+      <strong>ทดสอบระบบ</strong><br>
+      username: <code style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:4px">admin</code> / รหัส: อะไรก็ได้<br>
+      username: <code style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:4px">superadmin</code> / <code style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:4px">manager</code>
     </div>
   </div>
 </div>
 <script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
-if(Auth.isLoggedIn()) location.href='index.html';
-// Demo users — username หรือ email ก็ได้
+if(Auth.isLoggedIn())location.href='index.html';
 var DEMO={
-  // username สั้น
-  'admin':       {id:'u1',name:'Admin หัวกุญแจ',  role:'CENTER_ADMIN', centerId:'ctr-hk',centerName:'ศูนย์วิจัยหัวกุญแจ'},
-  'superadmin':  {id:'u0',name:'Super Admin',       role:'SUPER_ADMIN',  centerId:null,    centerName:'ทุกศูนย์'},
-  'manager':     {id:'u2',name:'ผู้บริหาร',          role:'MANAGER',      centerId:null,    centerName:'ทุกศูนย์'},
-  'driver':      {id:'u3',name:'ผู้ขับขี่ทดสอบ',    role:'DRIVER',       centerId:'ctr-hk',centerName:'ศูนย์วิจัยหัวกุญแจ'},
-  // email
-  'admin@fleet.local':      {id:'u1',name:'Admin หัวกุญแจ',role:'CENTER_ADMIN',centerId:'ctr-hk',centerName:'ศูนย์วิจัยหัวกุญแจ'},
-  'superadmin@fleet.local': {id:'u0',name:'Super Admin',    role:'SUPER_ADMIN', centerId:null,    centerName:'ทุกศูนย์'},
+  'admin':{id:'u1',name:'Admin หัวกุญแจ',role:'CENTER_ADMIN',centerId:'ctr-hk',centerName:'ศูนย์วิจัยหัวกุญแจ'},
+  'superadmin':{id:'u0',name:'Super Admin',role:'SUPER_ADMIN',centerId:null,centerName:'ทุกศูนย์'},
+  'manager':{id:'u2',name:'ผู้บริหาร',role:'MANAGER',centerId:null,centerName:'ทุกศูนย์'},
+  'driver':{id:'u3',name:'ผู้ขับขี่',role:'DRIVER',centerId:'ctr-hk',centerName:'ศูนย์วิจัยหัวกุญแจ'},
+  'admin@fleet.local':{id:'u1',name:'Admin หัวกุญแจ',role:'CENTER_ADMIN',centerId:'ctr-hk',centerName:'ศูนย์วิจัยหัวกุญแจ'},
 };
 function doLogin(){
-  var e=document.getElementById('email').value.trim();
+  var u=document.getElementById('user').value.trim();
   var p=document.getElementById('pass').value;
-  var err=document.getElementById('err');
-  var btn=document.getElementById('btn');
+  var err=document.getElementById('err');var btn=document.getElementById('btn');
   err.style.display='none';
-  if(!e||!p){err.textContent='กรุณากรอกอีเมลและรหัสผ่าน';err.style.display='block';return;}
+  if(!u||!p){err.textContent='กรุณากรอกข้อมูลให้ครบ';err.style.display='block';return;}
   btn.textContent='กำลังเข้าสู่ระบบ...';btn.disabled=true;
   function fallback(){
-    if(DEMO[e]){Auth.setUser(DEMO[e]);location.href="index.html";}
-    else{err.textContent='อีเมลหรือรหัสผ่านไม่ถูกต้อง';err.style.display='block';btn.textContent='เข้าสู่ระบบ';btn.disabled=false;}
+    if(DEMO[u]){Auth.setUser(DEMO[u]);location.href='index.html';}
+    else{err.textContent='ไม่พบผู้ใช้ในระบบ';err.style.display='block';btn.textContent='เข้าสู่ระบบ';btn.disabled=false;}
   }
-  API.call('login',{email:e,password:p}).then(function(r){if(r.success&&r.user){Auth.setUser(r.user);location.href='index.html';}else fallback();}).catch(fallback);
+  API.call('login',{email:u,password:p}).then(function(r){
+    if(r.success&&r.user){Auth.setUser(r.user);location.href='index.html';}else fallback();
+  }).catch(fallback);
 }
 document.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 </script>

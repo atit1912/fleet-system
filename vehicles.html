@@ -1,100 +1,92 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>FleetSHE — รถยนต์</title>
-<link rel="stylesheet" href="style.css">
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — รถยนต์</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="app">
-<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><div class="logo-mark">🚗</div><div><div class="logo-name">FleetSHE</div><div class="logo-sub">ระบบบริหารรถยนต์</div></div></div>
-  <div class="nav-group">เมนูหลัก</div>
+<div class="overlay" id="ov" onclick="closeSB()"></div>
+<nav class="sidebar" id="sb">
+  <div class="sb-header">
+    <div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
+    <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div>
+  </div>
+  <div class="sb-section">เมนูหลัก</div>
   <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
   <a href="vehicles.html" class="nav-item active"><span class="nav-icon">🚗</span>รถยนต์</a>
   <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
-  <div class="nav-group">ข้อมูล</div>
+  <div class="sb-section">ข้อมูล</div>
   <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
   <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
   <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
-  <div class="sidebar-footer"><div class="sf-name" id="sf-name">—</div><div class="sf-role" id="sf-role">—</div><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
+  <div class="sb-spacer"></div>
+  <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
 </nav>
 <main class="main">
   <header class="topbar">
-    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <span class="topbar-title">รถยนต์ทั้งหมด</span>
-    <div class="topbar-actions">
-      <select class="center-select" id="center-filter" onchange="loadVehicles()">
-        <option value="ALL">ทุกศูนย์</option>
-      </select>
+    <button class="menu-btn" onclick="openSB()">☰</button>
+    <div class="topbar-center"><div class="topbar-title">รถยนต์ทั้งหมด</div></div>
+    <div class="topbar-right">
+      <select class="center-sel" id="cf" onchange="loadV()"><option value="ALL">ทุกศูนย์</option></select>
     </div>
   </header>
   <div class="page-body">
     <div class="filter-row">
-      <button class="filter-btn active" onclick="filterS('ALL',this)">ทั้งหมด</button>
-      <button class="filter-btn" onclick="filterS('OVERDUE',this)">🔴 เกินกำหนด</button>
-      <button class="filter-btn" onclick="filterS('DUE_SOON',this)">🟡 ใกล้ครบ</button>
-      <button class="filter-btn" onclick="filterS('APPOINTED',this)">🔵 นัดแล้ว</button>
-      <button class="filter-btn" onclick="filterS('NORMAL',this)">🟢 ปกติ</button>
+      <button class="fpill active" onclick="fS('ALL',this)">ทั้งหมด</button>
+      <button class="fpill" onclick="fS('OVERDUE',this)">🔴 เกินกำหนด</button>
+      <button class="fpill" onclick="fS('DUE_SOON',this)">🟡 ใกล้ครบ</button>
+      <button class="fpill" onclick="fS('APPOINTED',this)">🔵 นัดแล้ว</button>
+      <button class="fpill" onclick="fS('NORMAL',this)">🟢 ปกติ</button>
     </div>
-    <div id="vehicle-list" class="card-list"><div class="loading-state">⏳ กำลังโหลด...</div></div>
+    <div id="vl"><div class="loading">⏳ กำลังโหลด...</div></div>
   </div>
 </main>
 <nav class="bottom-nav">
-  <a href="index.html" class="bnav-item"><div class="bnav-icon">🏠</div><span>หน้าหลัก</span></a>
-  <a href="vehicles.html" class="bnav-item active"><div class="bnav-icon">🚗</div><span>รถยนต์</span></a>
-  <a href="maintenance.html" class="bnav-item"><div class="bnav-icon">🔧</div><span>บำรุงรักษา</span></a>
-  <a href="drivers.html" class="bnav-item"><div class="bnav-icon">👤</div><span>ผู้ขับขี่</span></a>
-  <a href="report.html" class="bnav-item"><div class="bnav-icon">📊</div><span>รายงาน</span></a>
+  <a href="index.html" class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav active"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="maintenance.html" class="bnav"><div class="bnav-wrap">🔧</div><span>บำรุงรักษา</span></a>
+  <a href="drivers.html" class="bnav"><div class="bnav-wrap">👤</div><span>ผู้ขับขี่</span></a>
+  <a href="report.html" class="bnav"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
 </nav>
 </div>
 <script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
-var SEDAN='https://drive.google.com/thumbnail?id=1l-jLDSW563Y956T9XCpfMsV3_hkHphHD&sz=w400';
-var PICKUP='https://drive.google.com/thumbnail?id=1zH8t-zhoV--y8-V3TD7C4gZoGVvqXI22&sz=w400';
-function carImg(t){if(!t)return PICKUP;return t.toLowerCase().includes('เก๋ง')||t.toLowerCase().includes('sedan')?SEDAN:PICKUP;}
-var MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function thaiDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MONTHS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
-var allV=[];var curS='ALL';
+var allV=[],curS='ALL';
+var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
 document.addEventListener('DOMContentLoaded',function(){
   requireAuth();
   var u=Auth.getUser();
-  if(u){document.getElementById('sf-name').textContent=u.name;document.getElementById('sf-role').textContent=roleLabel(u.role);}
-  loadCenters();loadVehicles();
+  if(u){var i=u.name?u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'AD';document.getElementById('sb-av').textContent=i;document.getElementById('sb-nm').textContent=u.name;document.getElementById('sb-rl').textContent=roleLabel(u.role);}
+  API.call('getCenters').then(function(r){if(!r.success)return;var s=document.getElementById('cf');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
+  loadV();
 });
-function loadCenters(){API.call('getCenters').then(function(r){if(!r.success)return;var sel=document.getElementById('center-filter');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});});}
-function loadVehicles(){
-  var cid=document.getElementById('center-filter').value;
-  document.getElementById('vehicle-list').innerHTML='<div class="loading-state">⏳ กำลังโหลด...</div>';
-  API.call('getVehicles',{centerId:cid==='ALL'?null:cid}).then(function(r){
-    allV=r.success?r.data||[];[];
-    renderV(getF());
+function loadV(){
+  var c=document.getElementById('cf').value;
+  document.getElementById('vl').innerHTML='<div class="loading">⏳ กำลังโหลด...</div>';
+  API.call('getVehicles',{centerId:c==='ALL'?null:c}).then(function(r){
+    allV=r.success?r.data||[]:[];renderV(getF());
   }).catch(function(){renderV([]);});
 }
 function getF(){return curS==='ALL'?allV:allV.filter(function(v){return v.worstStatus===curS;});}
-function filterS(s,btn){curS=s;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderV(getF());}
+function fS(s,b){curS=s;document.querySelectorAll('.fpill').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderV(getF());}
 function renderV(list){
-  var el=document.getElementById('vehicle-list');
-  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🚗</div>ไม่มีรถในหมวดนี้</div>';return;}
-  el.innerHTML=list.map(function(v){
+  var el=document.getElementById('vl');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">🚗</div>ไม่มีรถในหมวดนี้</div>';return;}
+  el.innerHTML=list.map(function(v,i){
     var s=v.worstStatus||'NORMAL';
-    var cls='vc-'+(s==='OVERDUE'?'red':s==='DUE_SOON'?'amber':s==='APPOINTED'?'blue':'green');
-    var badge=s==='OVERDUE'?'<span class="badge badge-red">เกินกำหนด</span>':s==='DUE_SOON'?'<span class="badge badge-amber">ใกล้ครบ</span>':s==='APPOINTED'?'<span class="badge badge-blue">นัดแล้ว</span>':'<span class="badge badge-green">ปกติ</span>';
-    var worst=v.maintenance&&v.maintenance.find(function(m){return m.status===s;});
-    return '<a href="vehicle.html?id='+v.id+'" class="vehicle-card '+cls+'">'
-      +'<div class="vc-stripe"></div>'
-      +'<div class="vc-img-wrap"><img src="'+carImg(v.vehicle_type)+'" alt="'+v.plate_number+'" loading="lazy" onerror="this.style.display=\'none\'">'
-      +'<span class="vc-center-tag">'+(v.center_name||'')+'</span></div>'
-      +'<div class="vc-body"><div class="vc-top"><div><div class="vc-plate">'+v.plate_number+'</div>'
-      +'<div class="vc-model">'+v.vehicle_type+' · '+v.brand+' '+v.model+'</div></div>'+badge+'</div>'
-      +'<div class="vc-meta">🛣️ '+Number(v.current_mileage||0).toLocaleString()+' กม. · 👤 '+(v.primary_driver_name||'—')+'</div>'
-      +(worst&&worst.typeLabel?'<div class="vc-task">🔧 '+worst.typeLabel+'</div>':'')
+    var cm={OVERDUE:'vcard-red',DUE_SOON:'vcard-orange',APPOINTED:'vcard-blue',NORMAL:'vcard-green'};
+    var bm={OVERDUE:'<span class="badge b-red">เกินกำหนด</span>',DUE_SOON:'<span class="badge b-orange">ใกล้ครบ</span>',APPOINTED:'<span class="badge b-blue">นัดแล้ว</span>',NORMAL:'<span class="badge b-green">ปกติ</span>'};
+    var w=v.maintenance&&v.maintenance.find(function(m){return m.status===s;});
+    return '<a href="vehicle.html?id='+v.id+'" class="vcard '+(cm[s]||'vcard-green')+' fu'+(i<4?' fu'+(i+1):'')+'">'
+      +'<div class="vcard-stripe"></div><div class="vcard-body">'
+      +'<div class="vcard-row"><div><div class="vcard-plate">'+v.plate_number+'</div>'
+      +'<div class="vcard-model">'+v.vehicle_type+' · '+(v.center_name||'')+'</div></div>'+(bm[s]||bm.NORMAL)+'</div>'
+      +'<div class="vcard-meta">🛣️ '+Number(v.current_mileage||0).toLocaleString()+' กม. · 👤 '+(v.primary_driver_name||'—')+'</div>'
+      +(w&&w.typeLabel?'<div class="vcard-task">🔧 '+w.typeLabel+'</div>':'')
       +'</div></a>';
   }).join('');
 }
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
 </script>
 </body>
 </html>

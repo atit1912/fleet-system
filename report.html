@@ -1,125 +1,111 @@
 <!DOCTYPE html>
 <html lang="th">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE — รายงาน</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — รายงาน</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="app">
-<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><div class="logo-mark">🚗</div><div><div class="logo-name">FleetSHE</div><div class="logo-sub">ระบบบริหารรถยนต์</div></div></div>
-  <div class="nav-group">เมนูหลัก</div>
+<div class="overlay" id="ov" onclick="closeSB()"></div>
+<nav class="sidebar" id="sb">
+  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
+  <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div></div>
+  <div class="sb-section">เมนูหลัก</div>
   <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
   <a href="vehicles.html" class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
   <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
-  <div class="nav-group">ข้อมูล</div>
+  <div class="sb-section">ข้อมูล</div>
   <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
   <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
   <a href="report.html" class="nav-item active"><span class="nav-icon">📊</span>รายงาน</a>
-  <div class="sidebar-footer"><div class="sf-name" id="sf-name">—</div><div class="sf-role" id="sf-role">—</div><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
+  <div class="sb-spacer"></div>
+  <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
 </nav>
 <main class="main">
   <header class="topbar">
-    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <span class="topbar-title">รายงาน Audit</span>
-    <div class="topbar-actions">
-      <button class="topbar-btn" onclick="exportCSV()" title="Export CSV">📥</button>
+    <button class="menu-btn" onclick="openSB()">☰</button>
+    <div class="topbar-center"><div class="topbar-title">รายงาน Audit</div></div>
+    <div class="topbar-right">
+      <button class="topbar-icon" onclick="exportCSV()" title="Export CSV">📥</button>
     </div>
   </header>
   <div class="page-body">
-    <div class="card" style="margin-bottom:14px">
+    <div class="card si" style="margin-bottom:14px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">ศูนย์วิจัย</label>
-          <select class="form-select" id="rpt-center"><option value="ALL">ทุกศูนย์</option></select>
-        </div>
-        <div class="form-group" style="margin:0">
-          <label class="form-label">ประเภท</label>
-          <select class="form-select" id="rpt-type">
-            <option value="audit">Audit ตามแผน</option>
-          </select>
-        </div>
+        <div class="fgroup" style="margin:0"><label class="flabel">ศูนย์วิจัย</label><select class="fselect" id="rc"><option value="ALL">ทุกศูนย์</option></select></div>
+        <div class="fgroup" style="margin:0"><label class="flabel">ประเภท</label><select class="fselect" id="rt"><option value="audit">Audit ตามแผน</option></select></div>
       </div>
-      <button class="btn btn-primary btn-block mt-12" onclick="loadReport()">🔍 ดูรายงาน</button>
+      <button class="btn btn-primary btn-full mt-12" onclick="loadR()">🔍 ดูรายงาน</button>
     </div>
-
-    <!-- Summary cards -->
-    <div id="summary-cards" style="display:none;margin-bottom:14px">
+    <div id="sum" style="display:none;margin-bottom:14px">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-        <div class="kpi-card kpi-blue"><div class="kpi-bar"></div><div class="kpi-num" id="r-total" style="font-size:22px">—</div><div class="kpi-label">รายการทั้งหมด</div></div>
-        <div class="kpi-card kpi-green"><div class="kpi-bar"></div><div class="kpi-num" id="r-ok" style="font-size:22px">—</div><div class="kpi-label">ตามแผน</div></div>
-        <div class="kpi-card kpi-red"><div class="kpi-bar"></div><div class="kpi-num" id="r-late" style="font-size:22px">—</div><div class="kpi-label">ล่าช้า/ยังไม่ทำ</div></div>
+        <div class="kpi kpi-blue"><div class="kpi-accent"></div><div class="kpi-val" id="r0" style="font-size:24px">—</div><div class="kpi-lbl">รายการทั้งหมด</div></div>
+        <div class="kpi kpi-green"><div class="kpi-accent"></div><div class="kpi-val" id="r1" style="font-size:24px">—</div><div class="kpi-lbl">✅ ตามแผน</div></div>
+        <div class="kpi kpi-red"><div class="kpi-accent"></div><div class="kpi-val" id="r2" style="font-size:24px">—</div><div class="kpi-lbl">❌ ล่าช้า</div></div>
       </div>
     </div>
-
-    <div id="report-area"><div class="empty-state"><div class="empty-icon">📊</div>เลือกตัวกรองแล้วกด "ดูรายงาน"</div></div>
+    <div id="ra"><div class="empty"><div class="empty-icon">📊</div>เลือกตัวกรองแล้วกด "ดูรายงาน"</div></div>
   </div>
 </main>
 <nav class="bottom-nav">
-  <a href="index.html" class="bnav-item"><div class="bnav-icon">🏠</div><span>หน้าหลัก</span></a>
-  <a href="vehicles.html" class="bnav-item"><div class="bnav-icon">🚗</div><span>รถยนต์</span></a>
-  <a href="maintenance.html" class="bnav-item"><div class="bnav-icon">🔧</div><span>บำรุงรักษา</span></a>
-  <a href="drivers.html" class="bnav-item"><div class="bnav-icon">👤</div><span>ผู้ขับขี่</span></a>
-  <a href="report.html" class="bnav-item active"><div class="bnav-icon">📊</div><span>รายงาน</span></a>
+  <a href="index.html" class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="maintenance.html" class="bnav"><div class="bnav-wrap">🔧</div><span>บำรุงรักษา</span></a>
+  <a href="drivers.html" class="bnav"><div class="bnav-wrap">👤</div><span>ผู้ขับขี่</span></a>
+  <a href="report.html" class="bnav active"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
 </nav>
 </div>
 <script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
-var MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function thaiDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MONTHS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
-var MLAB={INITIAL_1000KM:'1,000 กม.',ROUTINE_10K:'10,000/6เดือน',TIRE_ROTATION:'สลับยาง',TIRE_REPLACEMENT:'เปลี่ยนยาง',BATTERY_REPLACEMENT:'แบตเตอรี่'};
-var reportData=null;
+var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
+var MLab={INITIAL_1000KM:'1,000 กม.',ROUTINE_10K:'10,000/6เดือน',TIRE_ROTATION:'สลับยาง',TIRE_REPLACEMENT:'เปลี่ยนยาง',BATTERY_REPLACEMENT:'แบตเตอรี่'};
+var rData=null;
+
 document.addEventListener('DOMContentLoaded',function(){
   requireAuth();var u=Auth.getUser();
-  if(u){document.getElementById('sf-name').textContent=u.name;document.getElementById('sf-role').textContent=roleLabel(u.role);}
-  API.call('getCenters').then(function(r){if(!r.success)return;var sel=document.getElementById('rpt-center');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});});
+  if(u){var i=u.name?u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'AD';document.getElementById('sb-av').textContent=i;document.getElementById('sb-nm').textContent=u.name;document.getElementById('sb-rl').textContent=roleLabel(u.role);}
+  API.call('getCenters').then(function(r){if(!r.success)return;var s=document.getElementById('rc');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
 });
-function loadReport(){
-  var cid=document.getElementById('rpt-center').value;
-  document.getElementById('report-area').innerHTML='<div class="loading-state">⏳ กำลังสร้างรายงาน...</div>';
-  document.getElementById('summary-cards').style.display='none';
-  API.call('getAuditReport',{centerId:cid}).then(function(r){
-    if(!r.success){document.getElementById('report-area').innerHTML='<div class="empty-state">เกิดข้อผิดพลาด</div>';return;}
-    reportData=r.data||[];
-    renderReport(reportData);
+
+function loadR(){
+  document.getElementById('ra').innerHTML='<div class="loading">⏳ กำลังสร้างรายงาน...</div>';
+  document.getElementById('sum').style.display='none';
+  API.call('getAuditReport',{centerId:document.getElementById('rc').value}).then(function(r){
+    if(!r.success){document.getElementById('ra').innerHTML='<div class="empty">เกิดข้อผิดพลาด</div>';return;}
+    rData=r.data||[];renderR(rData);
   });
 }
-function renderReport(data){
-  if(!data.length){document.getElementById('report-area').innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>ไม่พบข้อมูล</div>';return;}
-  var rows=[];var total=0;var ok=0;var late=0;
-  data.forEach(function(v){
-    (v.items||[]).forEach(function(item){
-      total++;
-      var onTime=item.onTime===null?null:item.onTime;
-      if(onTime===true)ok++;else if(onTime===false||onTime===null&&item.lastService===null)late++;
-      rows.push({plate:v.plateNumber,center:v.centerName,type:MLAB[item.type]||item.type,
-        last:item.lastService?thaiDate(item.lastService):'ยังไม่เคย',
-        onTime:onTime===null?'—':onTime?'<span class="on-time">✅ ตามแผน</span>':'<span class="late">❌ ล่าช้า</span>',
-        delayD:item.delayDays>0?item.delayDays+' วัน':'—',
-        delayK:item.delayKm>0?item.delayKm+' กม.':'—'});
-    });
-  });
-  // summary
-  document.getElementById('r-total').textContent=total;
-  document.getElementById('r-ok').textContent=ok;
-  document.getElementById('r-late').textContent=late;
-  document.getElementById('summary-cards').style.display='block';
-  var html='<div style="overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--shadow-sm)">'
-    +'<table class="report-table"><thead><tr>'
-    +'<th>ทะเบียน</th><th>ศูนย์</th><th>ประเภทงาน</th><th>เข้ารับบริการล่าสุด</th><th>ตามแผน</th><th>ล่าช้า(วัน)</th><th>ล่าช้า(กม.)</th>'
-    +'</tr></thead><tbody>'
-    +rows.map(function(r){return'<tr><td style="font-weight:700">'+r.plate+'</td><td>'+r.center+'</td><td>'+r.type+'</td><td>'+r.last+'</td><td>'+r.onTime+'</td><td>'+r.delayD+'</td><td>'+r.delayK+'</td></tr>';}).join('')
+
+function renderR(data){
+  if(!data.length){document.getElementById('ra').innerHTML='<div class="empty"><div class="empty-icon">📋</div>ไม่พบข้อมูล</div>';return;}
+  var rows=[],tot=0,ok=0,late=0;
+  data.forEach(function(v){(v.items||[]).forEach(function(it){
+    tot++;var on=it.onTime;
+    if(on===true)ok++;else late++;
+    rows.push({pl:v.plateNumber,cn:v.centerName,tp:MLab[it.type]||it.type,
+      ls:it.lastService?tDate(it.lastService):'ยังไม่เคย',
+      on:on===null?'<span class="t-muted">—</span>':on?'<span class="ok">✅ ตามแผน</span>':'<span class="late">❌ ล่าช้า</span>',
+      dd:it.delayDays>0?it.delayDays+' วัน':'—',dk:it.delayKm>0?it.delayKm+' กม.':'—'});
+  });});
+  document.getElementById('r0').textContent=tot;
+  document.getElementById('r1').textContent=ok;
+  document.getElementById('r2').textContent=late;
+  document.getElementById('sum').style.display='block';
+  document.getElementById('ra').innerHTML=
+    '<div style="overflow-x:auto;border-radius:var(--r16);border:1px solid var(--border);box-shadow:var(--sh1)">'
+    +'<table class="rtable"><thead><tr><th>ทะเบียน</th><th>ศูนย์</th><th>ประเภท</th><th>เข้ารับบริการ</th><th>ตามแผน</th><th>ล่าช้า(วัน)</th><th>ล่าช้า(กม.)</th></tr></thead>'
+    +'<tbody>'+rows.map(function(r){return'<tr><td style="font-weight:700">'+r.pl+'</td><td>'+r.cn+'</td><td>'+r.tp+'</td><td>'+r.ls+'</td><td>'+r.on+'</td><td>'+r.dd+'</td><td>'+r.dk+'</td></tr>';}).join('')
     +'</tbody></table></div>';
-  document.getElementById('report-area').innerHTML=html;
 }
+
 function exportCSV(){
-  if(!reportData){alert('กรุณาโหลดรายงานก่อน');return;}
-  var rows=[['ทะเบียน','ศูนย์','ประเภทงาน','เข้ารับบริการล่าสุด','ตามแผน','ล่าช้า(วัน)','ล่าช้า(กม.)']];
-  reportData.forEach(function(v){(v.items||[]).forEach(function(item){rows.push([v.plateNumber,v.centerName,MLAB[item.type]||item.type,item.lastService?thaiDate(item.lastService):'ยังไม่เคย',item.onTime===null?'—':item.onTime?'ตามแผน':'ล่าช้า',item.delayDays>0?item.delayDays:'—',item.delayKm>0?item.delayKm:'—']);});});
+  if(!rData){alert('กรุณาโหลดรายงานก่อน');return;}
+  var rows=[['ทะเบียน','ศูนย์','ประเภท','เข้ารับบริการ','ตามแผน','ล่าช้า(วัน)','ล่าช้า(กม.)']];
+  rData.forEach(function(v){(v.items||[]).forEach(function(it){rows.push([v.plateNumber,v.centerName,MLab[it.type]||it.type,it.lastService?tDate(it.lastService):'ยังไม่เคย',it.onTime===null?'—':it.onTime?'ตามแผน':'ล่าช้า',it.delayDays>0?it.delayDays:'—',it.delayKm>0?it.delayKm:'—']);});});
   var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fleet_audit_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  var b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='fleet_audit_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
 }
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
 </script>
 </body>
 </html>

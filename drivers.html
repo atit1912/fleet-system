@@ -1,78 +1,79 @@
 <!DOCTYPE html>
 <html lang="th">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE — ผู้ขับขี่</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — ผู้ขับขี่</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="app">
-<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><div class="logo-mark">🚗</div><div><div class="logo-name">FleetSHE</div><div class="logo-sub">ระบบบริหารรถยนต์</div></div></div>
-  <div class="nav-group">เมนูหลัก</div>
+<div class="overlay" id="ov" onclick="closeSB()"></div>
+<nav class="sidebar" id="sb">
+  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
+  <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div></div>
+  <div class="sb-section">เมนูหลัก</div>
   <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
   <a href="vehicles.html" class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
   <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
-  <div class="nav-group">ข้อมูล</div>
+  <div class="sb-section">ข้อมูล</div>
   <a href="drivers.html" class="nav-item active"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
   <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
   <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
-  <div class="sidebar-footer"><div class="sf-name" id="sf-name">—</div><div class="sf-role" id="sf-role">—</div><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
+  <div class="sb-spacer"></div>
+  <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
 </nav>
 <main class="main">
   <header class="topbar">
-    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <span class="topbar-title">ผู้ขับขี่</span>
-    <div class="topbar-actions"><select class="center-select" id="center-filter" onchange="loadDrivers()"><option value="ALL">ทุกศูนย์</option></select></div>
+    <button class="menu-btn" onclick="openSB()">☰</button>
+    <div class="topbar-center"><div class="topbar-title">ผู้ขับขี่</div></div>
+    <div class="topbar-right"><select class="center-sel" id="cf" onchange="loadDr()"><option value="ALL">ทุกศูนย์</option></select></div>
   </header>
   <div class="page-body">
-    <div id="driver-list" class="card-list"><div class="loading-state">⏳ กำลังโหลด...</div></div>
+    <div id="dl"><div class="loading">⏳ กำลังโหลด...</div></div>
   </div>
 </main>
 <nav class="bottom-nav">
-  <a href="index.html" class="bnav-item"><div class="bnav-icon">🏠</div><span>หน้าหลัก</span></a>
-  <a href="vehicles.html" class="bnav-item"><div class="bnav-icon">🚗</div><span>รถยนต์</span></a>
-  <a href="maintenance.html" class="bnav-item"><div class="bnav-icon">🔧</div><span>บำรุงรักษา</span></a>
-  <a href="drivers.html" class="bnav-item active"><div class="bnav-icon">👤</div><span>ผู้ขับขี่</span></a>
-  <a href="report.html" class="bnav-item"><div class="bnav-icon">📊</div><span>รายงาน</span></a>
+  <a href="index.html" class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="maintenance.html" class="bnav"><div class="bnav-wrap">🔧</div><span>บำรุงรักษา</span></a>
+  <a href="drivers.html" class="bnav active"><div class="bnav-wrap">👤</div><span>ผู้ขับขี่</span></a>
+  <a href="report.html" class="bnav"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
 </nav>
 </div>
 <script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
-var MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function thaiDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MONTHS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
+var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
 document.addEventListener('DOMContentLoaded',function(){
   requireAuth();var u=Auth.getUser();
-  if(u){document.getElementById('sf-name').textContent=u.name;document.getElementById('sf-role').textContent=roleLabel(u.role);}
-  loadCenters();loadDrivers();
+  if(u){var i=u.name?u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'AD';document.getElementById('sb-av').textContent=i;document.getElementById('sb-nm').textContent=u.name;document.getElementById('sb-rl').textContent=roleLabel(u.role);}
+  API.call('getCenters').then(function(r){if(!r.success)return;var s=document.getElementById('cf');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
+  loadDr();
 });
-function loadCenters(){API.call('getCenters').then(function(r){if(!r.success)return;var sel=document.getElementById('center-filter');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});});}
-function loadDrivers(){
-  var cid=document.getElementById('center-filter').value;
-  document.getElementById('driver-list').innerHTML='<div class="loading-state">⏳ กำลังโหลด...</div>';
-  API.call('getDrivers',{centerId:cid==='ALL'?null:cid}).then(function(r){
-    if(!r.success){renderD([]);return;}renderD(r.data||[]);
-  }).catch(function(){renderD([]);});
+function loadDr(){
+  document.getElementById('dl').innerHTML='<div class="loading">⏳ กำลังโหลด...</div>';
+  API.call('getDrivers',{centerId:document.getElementById('cf').value==='ALL'?null:document.getElementById('cf').value}).then(function(r){
+    renderDr(r.success?r.data||[]:[]);
+  }).catch(function(){renderDr([]);});
 }
-function renderD(list){
-  var el=document.getElementById('driver-list');
-  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">👤</div>ไม่พบข้อมูลผู้ขับขี่<br><small>กรุณากรอกข้อมูลในตาราง drivers</small></div>';return;}
-  el.innerHTML=list.map(function(d){
+function renderDr(list){
+  var el=document.getElementById('dl');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">👤</div>ไม่พบข้อมูลผู้ขับขี่<br><small style="color:var(--t4)">กรุณากรอกข้อมูลในตาราง drivers</small></div>';return;}
+  el.innerHTML=list.map(function(d,i){
     var ls=d.licenseStatus||'NO_LICENSE';
-    var lbadge=ls==='EXPIRED'?'<span class="badge badge-red">ใบขับขี่หมดอายุ</span>':ls==='EXPIRING_SOON'?'<span class="badge badge-amber">ใบขับขี่ใกล้หมด</span>':ls==='VALID'?'<span class="badge badge-green">ใบขับขี่ปกติ</span>':'<span class="badge" style="background:var(--bg);color:var(--text-3)">ไม่มีข้อมูล</span>';
-    var cls='lc-'+(ls==='EXPIRED'?'red':ls==='EXPIRING_SOON'?'amber':'green');
-    var initials=d.name?d.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'??';
-    return '<div class="list-card '+cls+'">'
-      +'<div class="lc-stripe"></div><div class="lc-body">'
-      +'<div class="lc-top">'
+    var lb=ls==='EXPIRED'?'<span class="badge b-red">ใบขับขี่หมดอายุ</span>':ls==='EXPIRING_SOON'?'<span class="badge b-orange">ใกล้หมด</span>':ls==='VALID'?'<span class="badge b-green">ปกติ</span>':'<span class="badge" style="background:var(--bg);color:var(--t4);border:1px solid var(--border)">ไม่มีข้อมูล</span>';
+    var cc=ls==='EXPIRED'?'vcard-red':ls==='EXPIRING_SOON'?'vcard-orange':'vcard-green';
+    var ini=d.name?d.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'??';
+    return '<div class="vcard '+cc+' fu'+(i<4?' fu'+(i+1):'')+'">'
+      +'<div class="vcard-stripe"></div><div class="vcard-body">'
+      +'<div class="vcard-row">'
       +'<div style="display:flex;align-items:center;gap:10px">'
-      +'<div style="width:40px;height:40px;border-radius:50%;background:var(--primary-bg);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">'+initials+'</div>'
-      +'<div><div class="lc-plate">'+d.name+'</div><div class="lc-sub">'+(d.department||'—')+' · '+(d.center_name||'')+'</div></div>'
-      +'</div>'+lbadge+'</div>'
-      +(d.phone?'<div class="lc-meta" style="margin-top:8px">📞 '+d.phone+'</div>':'')
-      +(d.licenses&&d.licenses.length?'<div class="lc-meta" style="margin-top:4px">🪪 '+d.licenses.map(function(l){return(l.type==='PERSONAL'?'ส่วนตัว':'ราชการ')+': '+thaiDate(l.expires_at);}).join(' · ')+'</div>':'')
+      +'<div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">'+ini+'</div>'
+      +'<div><div class="vcard-plate">'+d.name+'</div><div class="vcard-model">'+(d.department||'—')+' · '+(d.center_name||'')+'</div></div>'
+      +'</div>'+lb+'</div>'
+      +(d.phone?'<div class="vcard-meta" style="margin-top:6px">📞 '+d.phone+'</div>':'')
+      +(d.licenses&&d.licenses.length?'<div class="vcard-meta" style="margin-top:4px">🪪 '+d.licenses.map(function(l){return(l.type==='PERSONAL'?'ส่วนตัว':'ราชการ')+': '+tDate(l.expires_at);}).join(' · ')+'</div>':'')
       +'</div></div>';
   }).join('');
 }
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
 </script>
 </body>
 </html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FleetSHE — ผู้ขับขี่</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">🚗</div><div><div class="logo-name">FleetSHE</div><div class="logo-sub">ระบบบริหารรถยนต์</div></div></div>
+  <div class="nav-group-label">เมนูหลัก</div>
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
+  <a href="vehicles.html" class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
+  <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
+  <div class="nav-group-label">ข้อมูล</div>
+  <a href="drivers.html" class="nav-item active"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
+  <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
+  <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
+  <div class="sidebar-footer"><div class="sf-name" id="sf-name">—</div><div class="sf-role" id="sf-role">—</div></div>
+</nav>
+<main class="main">
+  <header class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <span class="topbar-title">ผู้ขับขี่</span>
+    <div class="topbar-actions">
+      <select class="center-select" id="center-filter" onchange="loadDrivers()">
+        <option value="ALL">ทุกศูนย์</option>
+      </select>
+    </div>
+  </header>
+  <div class="page-body">
+    <div id="driver-list" class="card-list"><div class="loading-state">⏳ กำลังโหลด...</div></div>
+  </div>
+</main>
+<nav class="bottom-nav">
+  <a href="index.html" class="bnav-item"><div class="bnav-icon-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav-item"><div class="bnav-icon-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="maintenance.html" class="bnav-item"><div class="bnav-icon-wrap">🔧</div><span>บำรุงรักษา</span></a>
+  <a href="drivers.html" class="bnav-item active"><div class="bnav-icon-wrap">👤</div><span>ผู้ขับขี่</span></a>
+  <a href="report.html" class="bnav-item"><div class="bnav-icon-wrap">📊</div><span>รายงาน</span></a>
+</nav>
+</div>
+<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  requireAuth();
+  var u=Auth.getUser();
+  if(u){document.getElementById('sf-name').textContent=u.name;document.getElementById('sf-role').textContent=roleLabel(u.role);}
+  loadCenters();loadDrivers();
+});
+function loadCenters(){
+  API.call('getCenters').then(function(r){
+    if(!r.success)return;
+    var sel=document.getElementById('center-filter');
+    r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
+  });
+}
+function loadDrivers(){
+  var cid=document.getElementById('center-filter').value;
+  document.getElementById('driver-list').innerHTML='<div class="loading-state">⏳ กำลังโหลด...</div>';
+  API.call('getDrivers',{centerId:cid==='ALL'?null:cid}).then(function(r){
+    if(!r.success){renderDrivers([]);return;}
+    renderDrivers(r.data||[]);
+  }).catch(function(){renderDrivers([]);});
+}
+function renderDrivers(list){
+  var el=document.getElementById('driver-list');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">👤</div>ไม่พบข้อมูลผู้ขับขี่</div>';return;}
+  el.innerHTML=list.map(function(d){
+    var ls=d.licenseStatus||'NO_LICENSE';
+    var lbadge=ls==='EXPIRED'?'<span class="badge badge-red">ใบขับขี่หมดอายุ</span>':ls==='EXPIRING_SOON'?'<span class="badge badge-amber">ใบขับขี่ใกล้หมด</span>':ls==='VALID'?'<span class="badge badge-green">ใบขับขี่ปกติ</span>':'<span class="badge" style="background:var(--bg);color:var(--text-3)">ไม่มีข้อมูล</span>';
+    return '<div class="vehicle-card vc-'+(ls==='EXPIRED'?'red':ls==='EXPIRING_SOON'?'amber':'green')+'">'
+      +'<div class="vc-stripe"></div><div class="vc-inner">'
+      +'<div class="vc-top"><div><div class="vc-plate">'+d.name+'</div>'
+      +'<div class="vc-sub">'+(d.department||'—')+' · '+(d.center_name||'')+'</div></div>'+lbadge+'</div>'
+      +(d.phone?'<div class="vc-meta">📞 '+d.phone+'</div>':'')
+      +(d.licenses&&d.licenses.length?'<div class="vc-meta" style="margin-top:4px">🪪 '+d.licenses.map(function(l){return (l.type==='PERSONAL'?'ส่วนตัว':'ราชการ')+': '+thaiDate(l.expires_at);}).join(' · ')+'</div>':'')
+      +'</div></div>';
+  }).join('');
+}
+function thaiDate(str){if(!str)return '—';try{var d=new Date(str);var m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return d.getDate()+' '+m[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return str;}}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+</script>
+</body>
+</html>

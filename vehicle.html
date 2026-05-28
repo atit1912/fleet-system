@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FleetSHE — รายละเอียดรถ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+<main class="main" style="margin-left:0;">
+  <div class="detail-hdr">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <div><div class="dh-plate" id="dh-plate">—</div><div class="dh-model" id="dh-model">—</div></div>
+    <div style="margin-left:auto" id="dh-badge"></div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="showTab('info',this)">ข้อมูลรถ</div>
+    <div class="tab" onclick="showTab('maint',this)">รอบบำรุง</div>
+    <div class="tab" onclick="showTab('history',this)">ประวัติ</div>
+    <div class="tab" onclick="showTab('mileage',this)">อัปเดตไมล์</div>
+  </div>
+  <div class="page-body">
+    <!-- INFO TAB -->
+    <div id="tab-info">
+      <div class="info-card" id="info-card"><div class="loading-state">⏳ กำลังโหลด...</div></div>
+    </div>
+    <!-- MAINTENANCE TAB -->
+    <div id="tab-maint" style="display:none">
+      <div id="maint-list"></div>
+    </div>
+    <!-- HISTORY TAB -->
+    <div id="tab-history" style="display:none">
+      <div id="history-list"></div>
+      <div class="mt-12">
+        <button class="btn btn-primary btn-block" onclick="showAddService()">+ บันทึกการเข้ารับบริการ</button>
+      </div>
+    </div>
+    <!-- MILEAGE TAB -->
+    <div id="tab-mileage" style="display:none">
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">เลขไมล์ปัจจุบัน (กม.)</label>
+          <input type="number" id="new-mileage" class="form-input" placeholder="เช่น 12345" style="font-size:22px;font-weight:700;text-align:center;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">วันที่อัปเดต</label>
+          <input type="date" id="mileage-date" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">หมายเหตุ (ถ้ามี)</label>
+          <input type="text" id="mileage-note" class="form-input" placeholder="เช่น กลับจากภาคสนาม">
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="saveMileage()">💾 บันทึกเลขไมล์</button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+<style>
+.status-timeline{display:flex;align-items:center;gap:0;margin:12px 0;overflow-x:auto;padding:4px 0;}
+.tl-step{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--bg);border:2px solid var(--border);}
+.tl-dot.done{background:var(--green);border-color:var(--green);color:#fff;}
+.tl-label{font-size:10px;color:var(--text-3);white-space:nowrap;}
+.tl-line{width:24px;height:2px;background:var(--border);flex-shrink:0;margin-top:-12px;}
+.tl-line.done{background:var(--green);}
+.appt-form{background:var(--surface);border:1.5px solid var(--primary);border-radius:var(--r-lg);padding:16px;margin-top:10px;}
+</style>
+<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
+<script>
+var VID='';var VDATA=null;
+var MTYPE_LABEL={INITIAL_1000KM:'ตรวจเช็กระยะ 1,000 กม.แรก',ROUTINE_10K:'ตรวจเช็กตามระยะ',TIRE_ROTATION:'สลับยาง',TIRE_REPLACEMENT:'เปลี่ยนยาง',BATTERY_REPLACEMENT:'เปลี่ยนแบตเตอรี่'};
+
+document.addEventListener('DOMContentLoaded',function(){
+  requireAuth();
+  VID=new URLSearchParams(location.search).get('id')||'';
+  // set today
+  document.getElementById('mileage-date').value=new Date().toISOString().split('T')[0];
+  if(VID)loadVehicle();
+});
+
+function loadVehicle(){
+  API.call('getVehicle',{id:VID}).then(function(r){
+    if(!r.success)return;
+    VDATA=r.data;
+    renderInfo(r.data);
+    renderMaint(r.data.maintenance||[]);
+    renderHistory(r.data.serviceRecords||[]);
+    // pre-fill mileage
+    document.getElementById('new-mileage').value=r.data.current_mileage||'';
+  });
+}
+
+function renderInfo(v){
+  var s=v.worstStatus||'NORMAL';
+  document.getElementById('dh-plate').textContent=v.plate_number;
+  document.getElementById('dh-model').textContent=v.vehicle_type+' · '+v.center_name;
+  var badgeMap={OVERDUE:'badge-red',DUE_SOON:'badge-amber',APPOINTED:'badge-blue',NORMAL:'badge-green'};
+  var labelMap={OVERDUE:'เกินกำหนด',DUE_SOON:'ใกล้ครบกำหนด',APPOINTED:'นัดแล้ว',NORMAL:'ปกติ'};
+  document.getElementById('dh-badge').innerHTML='<span class="badge '+badgeMap[s]+'">'+(labelMap[s]||s)+'</span>';
+  document.getElementById('info-card').innerHTML=
+    '<div class="info-card-hdr">🚗 ข้อมูลรถ</div>'+
+    row('📋','ทะเบียน',v.plate_number)+
+    row('🚙','ประเภท',v.vehicle_type)+
+    row('🏢','ศูนย์วิจัย',v.center_name||'—')+
+    row('👤','ผู้ครอบครอง',v.primary_driver_name||'—')+
+    row('📅','วันที่รับรถ',thaiDate(v.delivered_at))+
+    row('🛣️','เลขไมล์ล่าสุด',Number(v.current_mileage||0).toLocaleString()+' กม.')+
+    row('🗓️','อัปเดตไมล์',thaiDate(v.mileage_updated_at));
+}
+
+function row(icon,label,val){
+  return '<div class="info-row"><div class="info-icon">'+icon+'</div><div><div class="info-label">'+label+'</div><div class="info-val">'+val+'</div></div></div>';
+}
+
+function renderMaint(list){
+  var el=document.getElementById('maint-list');
+  if(!list.length){el.innerHTML='<div class="empty-state">ไม่มีข้อมูล</div>';return;}
+  el.innerHTML=list.map(function(m){
+    var s=m.status;
+    var color=s==='OVERDUE'?'var(--red)':s==='DUE_SOON'?'var(--amber)':s==='APPOINTED'?'var(--primary)':'var(--green)';
+    var bg=s==='OVERDUE'?'var(--red-bg)':s==='DUE_SOON'?'var(--amber-bg)':s==='APPOINTED'?'var(--blue-bg)':'var(--green-bg)';
+    var badge=s==='OVERDUE'?'badge-red':s==='DUE_SOON'?'badge-amber':s==='APPOINTED'?'badge-blue':'badge-green';
+    var slabel=s==='OVERDUE'?'เกินกำหนด':s==='DUE_SOON'?'ใกล้ครบกำหนด':s==='APPOINTED'?'นัดแล้ว':s==='COMPLETED'?'เสร็จแล้ว':'ปกติ';
+    var kmPct=m.dueMileage&&VDATA?Math.min(100,Math.round((VDATA.current_mileage/m.dueMileage)*100)):0;
+    var prog=kmPct>=100?'prog-red':kmPct>=90?'prog-amber':'prog-blue';
+    return '<div class="maint-card">'
+      +'<div class="mc-top">'
+      +'<div class="mc-icon" style="background:'+bg+';color:'+color+'">🔧</div>'
+      +'<div style="flex:1"><div class="mc-title">'+(m.typeLabel||MTYPE_LABEL[m.type]||m.type)+'</div>'
+      +(m.remainingDays!=null?'<div class="mc-sub">'+(m.remainingDays<0?'เกินกำหนด '+Math.abs(m.remainingDays)+' วัน':'อีก '+m.remainingDays+' วัน')+'</div>':'')
+      +'</div>'
+      +'<span class="badge '+badge+'">'+slabel+'</span>'
+      +'</div>'
+      +(m.dueMileage?'<div class="dual-prog">'
+        +'<div><div class="dp-label">ระยะทาง</div>'
+        +'<div class="prog-track"><div class="prog-fill '+prog+'" style="width:'+kmPct+'%"></div></div>'
+        +'<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+Number(VDATA&&VDATA.current_mileage||0).toLocaleString()+' / '+Number(m.dueMileage).toLocaleString()+' กม.</div></div>'
+        +(m.dueDate?'<div><div class="dp-label">กำหนด</div>'
+          +'<div style="font-size:12px;font-weight:500;margin-top:4px">'+thaiDate(m.dueDate)+'</div></div>':'')
+        +'</div>':'')
+      +(s!=='APPOINTED'&&s!=='COMPLETED'?'<div class="appt-form" style="margin-top:10px">'
+        +'<div class="form-group"><label class="form-label" style="font-size:12px">📅 ตั้งวันนัดหมาย</label>'
+        +'<input type="date" id="appt-'+m.type+'" class="form-input"></div>'
+        +'<button class="btn btn-primary btn-sm" onclick="setAppt(\''+m.type+'\')">บันทึกนัดหมาย</button>'
+        +'</div>':'')
+      +'</div>';
+  }).join('');
+}
+
+function renderHistory(list){
+  var el=document.getElementById('history-list');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>ยังไม่มีประวัติการซ่อม</div>';return;}
+  el.innerHTML=list.map(function(r){
+    return '<div class="info-card" style="margin-bottom:10px">'
+      +'<div class="info-card-hdr">📋 '+thaiDate(r.serviced_at)+' · '+Number(r.mileage_at_service||0).toLocaleString()+' กม.</div>'
+      +'<div style="padding:12px 16px">'
+      +'<div style="font-size:13px;color:var(--text-1);font-weight:500">'+(MTYPE_LABEL[r.maintenance_type]||r.maintenance_type||'ไม่ระบุ')+'</div>'
+      +(r.tasks?'<div style="font-size:12px;color:var(--text-2);margin-top:4px">'+r.tasks+'</div>':'')
+      +(r.notes?'<div style="font-size:12px;color:var(--text-3);margin-top:4px;font-style:italic">'+r.notes+'</div>':'')
+      +'</div></div>';
+  }).join('');
+}
+
+function setAppt(type){
+  var d=document.getElementById('appt-'+type).value;
+  if(!d){alert('กรุณาเลือกวันที่');return;}
+  API.post('setAppointment',{vehicleId:VID,maintenanceType:type,appointmentDate:d})
+    .then(function(r){if(r.success){alert('บันทึกนัดหมายเรียบร้อย');loadVehicle();}else alert('เกิดข้อผิดพลาด');});
+}
+
+function saveMileage(){
+  var m=parseInt(document.getElementById('new-mileage').value);
+  var d=document.getElementById('mileage-date').value;
+  var n=document.getElementById('mileage-note').value;
+  if(!m||m<0){alert('กรุณากรอกเลขไมล์ที่ถูกต้อง');return;}
+  API.post('updateMileage',{vehicleId:VID,mileage:m,recordedAt:d,note:n})
+    .then(function(r){if(r.success){alert('บันทึกเลขไมล์เรียบร้อย ✅');loadVehicle();}else alert('เกิดข้อผิดพลาด');});
+}
+
+function showTab(id,el){
+  ['info','maint','history','mileage'].forEach(function(t){document.getElementById('tab-'+t).style.display=t===id?'block':'none';});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+}
+
+function thaiDate(str){
+  if(!str)return '—';
+  try{var d=new Date(str);var m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return d.getDate()+' '+m[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return str;}
+}
+function showAddService(){showTab('history',document.querySelectorAll('.tab')[2]);}
+</script>
+</body>
+</html>

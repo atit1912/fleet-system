@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FleetSHE — รถยนต์</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">🚗</div><div><div class="logo-name">FleetSHE</div><div class="logo-sub">ระบบบริหารรถยนต์</div></div></div>
+  <div class="nav-group-label">เมนูหลัก</div>
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
+  <a href="vehicles.html" class="nav-item active"><span class="nav-icon">🚗</span>รถยนต์</a>
+  <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
+  <div class="nav-group-label">ข้อมูล</div>
+  <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
+  <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
+  <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
+  <div class="sidebar-footer"><div class="sf-name" id="sf-name">—</div><div class="sf-role" id="sf-role">—</div></div>
+</nav>
+<main class="main">
+  <header class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <span class="topbar-title">รถยนต์ทั้งหมด</span>
+    <div class="topbar-actions">
+      <select class="center-select" id="center-filter" onchange="loadVehicles()">
+        <option value="ALL">ทุกศูนย์</option>
+      </select>
+    </div>
+  </header>
+  <div class="page-body">
+    <!-- Filter pills -->
+    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;" id="status-filters">
+      <button class="filter-btn active" onclick="filterStatus('ALL',this)">ทั้งหมด</button>
+      <button class="filter-btn" onclick="filterStatus('OVERDUE',this)">🔴 เกินกำหนด</button>
+      <button class="filter-btn" onclick="filterStatus('DUE_SOON',this)">🟡 ใกล้ครบกำหนด</button>
+      <button class="filter-btn" onclick="filterStatus('APPOINTED',this)">🔵 นัดแล้ว</button>
+      <button class="filter-btn" onclick="filterStatus('NORMAL',this)">🟢 ปกติ</button>
+    </div>
+    <div id="vehicle-list" class="card-list"><div class="loading-state">⏳ กำลังโหลด...</div></div>
+  </div>
+</main>
+<nav class="bottom-nav">
+  <a href="index.html" class="bnav-item"><div class="bnav-icon-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav-item active"><div class="bnav-icon-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="maintenance.html" class="bnav-item"><div class="bnav-icon-wrap">🔧</div><span>บำรุงรักษา</span></a>
+  <a href="drivers.html" class="bnav-item"><div class="bnav-icon-wrap">👤</div><span>ผู้ขับขี่</span></a>
+  <a href="report.html" class="bnav-item"><div class="bnav-icon-wrap">📊</div><span>รายงาน</span></a>
+</nav>
+</div>
+<style>
+.filter-btn{padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;color:var(--text-2);white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.filter-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+</style>
+<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
+<script>
+var allVehicles=[];var currentStatus='ALL';
+document.addEventListener('DOMContentLoaded',function(){
+  requireAuth();
+  var u=Auth.getUser();
+  if(u){document.getElementById('sf-name').textContent=u.name;document.getElementById('sf-role').textContent=roleLabel(u.role);}
+  loadCenters();loadVehicles();
+});
+function loadCenters(){
+  API.call('getCenters').then(function(r){
+    if(!r.success)return;
+    var sel=document.getElementById('center-filter');
+    r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
+  });
+}
+function loadVehicles(){
+  var cid=document.getElementById('center-filter').value;
+  document.getElementById('vehicle-list').innerHTML='<div class="loading-state">⏳ กำลังโหลด...</div>';
+  API.call('getVehicles',{centerId:cid==='ALL'?null:cid}).then(function(r){
+    if(!r.success){renderVehicles([]);return;}
+    allVehicles=r.data||[];
+    renderVehicles(filterList());
+  }).catch(function(){renderVehicles([]);});
+}
+function filterList(){
+  if(currentStatus==='ALL')return allVehicles;
+  return allVehicles.filter(function(v){return v.worstStatus===currentStatus;});
+}
+function filterStatus(s,btn){
+  currentStatus=s;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderVehicles(filterList());
+}
+function renderVehicles(list){
+  var el=document.getElementById('vehicle-list');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🚗</div>ไม่มีรถในหมวดนี้</div>';return;}
+  el.innerHTML=list.map(function(v){
+    var s=v.worstStatus||'NORMAL';
+    var cls=s==='OVERDUE'?'vc-red':s==='DUE_SOON'?'vc-amber':s==='APPOINTED'?'vc-blue':'vc-green';
+    var badge=s==='OVERDUE'?'<span class="badge badge-red">เกินกำหนด</span>':s==='DUE_SOON'?'<span class="badge badge-amber">ใกล้ครบกำหนด</span>':s==='APPOINTED'?'<span class="badge badge-blue">นัดแล้ว</span>':'<span class="badge badge-green">ปกติ</span>';
+    var worst=v.maintenance&&v.maintenance.find(function(m){return m.status===s;});
+    var meta='🛣️ '+Number(v.current_mileage||0).toLocaleString()+' กม.';
+    if(v.primary_driver_name)meta+=' · 👤 '+v.primary_driver_name;
+    return '<a href="vehicle.html?id='+v.id+'" class="vehicle-card '+cls+'">'
+      +'<div class="vc-stripe"></div><div class="vc-inner">'
+      +'<div class="vc-top"><div><div class="vc-plate">'+v.plate_number+'</div>'
+      +'<div class="vc-sub">'+v.vehicle_type+' · '+(v.center_name||'')+'</div></div>'+badge+'</div>'
+      +'<div class="vc-meta">'+meta+'</div>'
+      +(worst&&worst.typeLabel?'<div class="vc-task">🔧 '+worst.typeLabel+'</div>':'')
+      +'</div></a>';
+  }).join('');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+</script>
+</body>
+</html>

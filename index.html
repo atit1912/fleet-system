@@ -11,26 +11,27 @@
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-icon">🚗</div>
+    <div class="logo-mark">🚗</div>
     <div><div class="logo-name">FleetSHE</div><div class="logo-sub">ระบบบริหารรถยนต์</div></div>
   </div>
-  <div class="nav-group-label">เมนูหลัก</div>
+  <div class="nav-group">เมนูหลัก</div>
   <a href="index.html" class="nav-item active"><span class="nav-icon">🏠</span>Dashboard</a>
   <a href="vehicles.html" class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
   <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
-  <div class="nav-group-label">ข้อมูล</div>
+  <div class="nav-group">ข้อมูล</div>
   <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
   <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
   <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
   <div class="sidebar-footer">
     <div class="sf-name" id="sf-name">—</div>
     <div class="sf-role" id="sf-role">—</div>
+    <button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button>
   </div>
 </nav>
 <main class="main">
   <header class="topbar">
     <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <span class="topbar-title">ภาพรวมระบบ</span>
+    <div><div class="topbar-title">ภาพรวมระบบ</div><div class="topbar-date" id="today-date"></div></div>
     <div class="topbar-actions">
       <select class="center-select" id="center-filter" onchange="loadDashboard()">
         <option value="ALL">ทุกศูนย์</option>
@@ -38,32 +39,66 @@
     </div>
   </header>
   <div class="page-body">
-    <div class="kpi-grid">
-      <div class="kpi-card kpi-blue fu"><div class="kpi-accent"></div><div class="kpi-icon-wrap">🚗</div><div class="kpi-num" id="k-total">—</div><div class="kpi-label">รถทั้งหมด</div></div>
-      <div class="kpi-card kpi-red fu fu-1"><div class="kpi-accent"></div><div class="kpi-icon-wrap">⚠️</div><div class="kpi-num" id="k-over">—</div><div class="kpi-label">เกินกำหนด</div></div>
-      <div class="kpi-card kpi-amber fu fu-2"><div class="kpi-accent"></div><div class="kpi-icon-wrap">⏰</div><div class="kpi-num" id="k-soon">—</div><div class="kpi-label">ใกล้ครบกำหนด</div></div>
-      <div class="kpi-card kpi-green fu fu-3"><div class="kpi-accent"></div><div class="kpi-icon-wrap">✅</div><div class="kpi-num" id="k-ok">—</div><div class="kpi-label">ปกติ</div></div>
+
+    <!-- Hero -->
+    <div class="hero-card fu">
+      <div class="hero-date" id="hero-date"></div>
+      <div class="hero-greeting" id="hero-name">สวัสดี</div>
+      <div class="hero-sub" id="hero-role">ระบบบริหารรถยนต์หน่วยงาน</div>
     </div>
+
+    <!-- KPI -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-blue fu"><div class="kpi-bar"></div><div class="kpi-icon">🚗</div><div class="kpi-num" id="k-total">—</div><div class="kpi-label">รถทั้งหมด</div></div>
+      <div class="kpi-card kpi-red fu fu-1"><div class="kpi-bar"></div><div class="kpi-icon">⚠️</div><div class="kpi-num" id="k-over">—</div><div class="kpi-label">เกินกำหนด</div></div>
+      <div class="kpi-card kpi-amber fu fu-2"><div class="kpi-bar"></div><div class="kpi-icon">⏰</div><div class="kpi-num" id="k-soon">—</div><div class="kpi-label">ใกล้ครบกำหนด</div></div>
+      <div class="kpi-card kpi-green fu fu-3"><div class="kpi-bar"></div><div class="kpi-icon">✅</div><div class="kpi-num" id="k-ok">—</div><div class="kpi-label">ปกติ</div></div>
+    </div>
+
     <div class="sec-hdr"><span class="sec-title">รายการที่ต้องดำเนินการ</span><a href="vehicles.html" class="sec-link">ดูทั้งหมด →</a></div>
-    <div id="urgent-list" class="card-list"><div class="loading-state">⏳ กำลังโหลดข้อมูล...</div></div>
+    <div id="urgent-list" class="card-list"><div class="loading-state">⏳ กำลังโหลด...</div></div>
   </div>
 </main>
 <nav class="bottom-nav">
-  <a href="index.html" class="bnav-item active"><div class="bnav-icon-wrap">🏠</div><span>หน้าหลัก</span></a>
-  <a href="vehicles.html" class="bnav-item"><div class="bnav-icon-wrap">🚗</div><span>รถยนต์</span></a>
-  <a href="maintenance.html" class="bnav-item"><div class="bnav-icon-wrap">🔧</div><span>บำรุงรักษา</span></a>
-  <a href="drivers.html" class="bnav-item"><div class="bnav-icon-wrap">👤</div><span>ผู้ขับขี่</span></a>
-  <a href="report.html" class="bnav-item"><div class="bnav-icon-wrap">📊</div><span>รายงาน</span></a>
+  <a href="index.html" class="bnav-item active"><div class="bnav-icon">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav-item"><div class="bnav-icon">🚗</div><span>รถยนต์</span></a>
+  <a href="maintenance.html" class="bnav-item"><div class="bnav-icon">🔧</div><span>บำรุงรักษา</span></a>
+  <a href="drivers.html" class="bnav-item"><div class="bnav-icon">👤</div><span>ผู้ขับขี่</span></a>
+  <a href="report.html" class="bnav-item"><div class="bnav-icon">📊</div><span>รายงาน</span></a>
 </nav>
 </div>
 <script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
+var CAR_IMG={
+  'เก๋ง':'https://drive.google.com/thumbnail?id=1zH8t-zhoV--y8-V3TD7C4gZoGVvqXI22&sz=w400',
+  'sedan':'https://drive.google.com/thumbnail?id=1zH8t-zhoV--y8-V3TD7C4gZoGVvqXI22&sz=w400',
+  'default':'https://drive.google.com/thumbnail?id=1l-jLDSW563Y956T9XCpfMsV3_hkHphHD&sz=w400'
+};
+function carImg(type){
+  if(!type)return CAR_IMG.default;
+  var t=type.toLowerCase();
+  if(t.includes('เก๋ง')||t.includes('sedan')||t.includes('saloon'))return CAR_IMG['เก๋ง'];
+  return CAR_IMG.default;
+}
+var MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thaiDate(d){var dt=new Date(d);return dt.getDate()+' '+MONTHS[dt.getMonth()]+' '+(dt.getFullYear()+543);}
+function todayThai(){var d=new Date();var days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];return 'วัน'+days[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]+' '+(d.getFullYear()+543);}
+
 document.addEventListener('DOMContentLoaded',function(){
   requireAuth();
   var u=Auth.getUser();
-  if(u){document.getElementById('sf-name').textContent=u.name;document.getElementById('sf-role').textContent=roleLabel(u.role);}
+  var d=todayThai();
+  document.getElementById('today-date').textContent=d;
+  document.getElementById('hero-date').textContent=d;
+  if(u){
+    document.getElementById('sf-name').textContent=u.name;
+    document.getElementById('sf-role').textContent=roleLabel(u.role);
+    document.getElementById('hero-name').textContent='สวัสดี, '+u.name;
+    document.getElementById('hero-role').textContent=roleLabel(u.role)+' · '+(u.centerName||'');
+  }
   loadCenters();loadDashboard();
 });
+
 function loadCenters(){
   API.call('getCenters').then(function(r){
     if(!r.success)return;
@@ -71,19 +106,21 @@ function loadCenters(){
     r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
   });
 }
+
 function loadDashboard(){
   var cid=document.getElementById('center-filter').value;
-  document.getElementById('urgent-list').innerHTML='<div class="loading-state">⏳ กำลังโหลดข้อมูล...</div>';
+  document.getElementById('urgent-list').innerHTML='<div class="loading-state">⏳ กำลังโหลด...</div>';
   API.call('getDashboard',{centerId:cid}).then(function(r){
-    if(!r.success){renderNoData();return;}
+    if(!r.success){noData();return;}
     var s=r.summary;
     document.getElementById('k-total').textContent=s.total||0;
     document.getElementById('k-over').textContent=s.overdue||0;
     document.getElementById('k-soon').textContent=s.dueSoon||0;
-    document.getElementById('k-ok').textContent=(s.normal||0)+(s.appointed>0?' (+'+s.appointed+' นัด)':'');
+    document.getElementById('k-ok').textContent=(s.normal||0)+(s.appointed>0?' (+'+s.appointed+')':'');
     renderUrgent(r.urgentList||[]);
-  }).catch(renderNoData);
+  }).catch(noData);
 }
+
 function renderUrgent(list){
   var el=document.getElementById('urgent-list');
   if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div>ไม่มีรายการที่ต้องดำเนินการ</div>';return;}
@@ -92,18 +129,22 @@ function renderUrgent(list){
     var cls=over?'vc-red':'vc-amber';
     var badge=over?'<span class="badge badge-red">🔴 เกินกำหนด</span>':'<span class="badge badge-amber">🟡 ใกล้ครบกำหนด</span>';
     var meta=[];
-    if(v.remainingKm!=null)meta.push((v.remainingKm<0?'เกิน '+Math.abs(v.remainingKm)+' กม.':'เหลือ '+v.remainingKm+' กม.'));
-    if(v.remainingDays!=null)meta.push((v.remainingDays<0?'เกิน '+Math.abs(v.remainingDays)+' วัน':'อีก '+v.remainingDays+' วัน'));
+    if(v.remainingKm!=null)meta.push(v.remainingKm<0?'เกิน '+Math.abs(v.remainingKm)+' กม.':'เหลือ '+v.remainingKm+' กม.');
+    if(v.remainingDays!=null)meta.push(v.remainingDays<0?'เกิน '+Math.abs(v.remainingDays)+' วัน':'อีก '+v.remainingDays+' วัน');
     return '<a href="vehicle.html?id='+v.vehicleId+'" class="vehicle-card '+cls+'">'
-      +'<div class="vc-stripe"></div><div class="vc-inner">'
-      +'<div class="vc-top"><div><div class="vc-plate">'+v.plateNumber+'</div>'
-      +'<div class="vc-sub">'+v.brand+' '+v.model+(v.centerName?' · '+v.centerName:'')+'</div></div>'+badge+'</div>'
+      +'<div class="vc-stripe"></div>'
+      +'<div class="vc-img-wrap"><img src="'+carImg(v.vehicleType||v.type)+'" alt="'+v.plateNumber+'" loading="lazy" onerror="this.style.display=\'none\'">'
+      +'<span class="vc-center-tag">'+(v.centerName||'')+'</span></div>'
+      +'<div class="vc-body"><div class="vc-top"><div><div class="vc-plate">'+v.plateNumber+'</div>'
+      +'<div class="vc-model">'+(v.brand||'')+' '+(v.model||'')+'</div></div>'+badge+'</div>'
       +'<div class="vc-meta">'+meta.join(' · ')+'</div>'
-      +'<div class="vc-task">🔧 '+(v.typeLabel||'')+'</div>'
-      +'</div></a>';
+      +'<div class="vc-task">🔧 '+(v.typeLabel||'')+'</div></div></a>';
   }).join('');
 }
-function renderNoData(){document.getElementById('urgent-list').innerHTML='<div class="empty-state"><div class="empty-icon">🚗</div>ยังไม่มีข้อมูลรถ<br><small>กรุณากรอกข้อมูลใน Google Sheet</small></div>';}
+
+function noData(){
+  document.getElementById('urgent-list').innerHTML='<div class="empty-state"><div class="empty-icon">🚗</div>ยังไม่มีข้อมูลรถ</div>';
+}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
 </script>

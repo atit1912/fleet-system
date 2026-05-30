@@ -1,111 +1,620 @@
 <!DOCTYPE html>
 <html lang="th">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — รายงาน</title><link rel="stylesheet" href="style.css"></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FleetSHE&En — รายงานผู้บริหาร</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── Executive Report Styles ── */
+.exec-hero {
+  background: linear-gradient(135deg, #1a2744 0%, #0f3460 60%, #16213e 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.exec-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.exec-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: 30%;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.03);
+}
+.exec-hero-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
+}
+.exec-hero-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.exec-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.exec-kpi {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.exec-kpi-val {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.exec-kpi-val.c-red    { color: #ff6b6b; }
+.exec-kpi-val.c-amber  { color: #ffd166; }
+.exec-kpi-val.c-green  { color: #06d6a0; }
+.exec-kpi-val.c-white  { color: #fff; }
+.exec-kpi-lbl {
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
+}
+.exec-score-bar {
+  margin-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+.exec-score-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 6px;
+}
+.exec-score-track {
+  background: rgba(255,255,255,0.12);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+.exec-score-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s ease;
+  background: linear-gradient(90deg, #06d6a0, #4cc9f0);
+}
+
+/* ── Filter bar ── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  align-items: flex-end;
+}
+.filter-bar .fgroup { margin: 0; flex: 1; }
+.filter-bar .btn { flex: 0 0 auto; margin-bottom: 0; }
+
+/* ── Vehicle card ── */
+.vcard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+.vcard:active { box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+.vcard-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.vcard-plate {
+  font-size: 16px;
+  font-weight: 800;
+  font-family: monospace;
+  color: var(--text-primary);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 8px;
+  letter-spacing: 1px;
+  flex: 0 0 auto;
+}
+.vcard-info {
+  flex: 1;
+  min-width: 0;
+}
+.vcard-model {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vcard-center {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.vcard-badges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+.badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.badge-ok       { background: #e6faf4; color: #0a7c5c; border: 1px solid #b2eeda; }
+.badge-late     { background: #fff0f0; color: #c0392b; border: 1px solid #fbc6c6; }
+.badge-warn     { background: #fffbea; color: #9a6700; border: 1px solid #ffe082; }
+.badge-none     { background: var(--bg2); color: var(--text-muted); border: 1px solid var(--border); }
+.badge-appt     { background: #eef3ff; color: #3d5fc7; border: 1px solid #c3d0f7; }
+
+/* ── Score donut ── */
+.vcard-score {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.score-circle {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+.score-ok   { background: #e6faf4; color: #0a7c5c; border: 2px solid #06d6a0; }
+.score-warn { background: #fffbea; color: #9a6700; border: 2px solid #ffd166; }
+.score-bad  { background: #fff0f0; color: #c0392b; border: 2px solid #ff6b6b; }
+.score-na   { background: var(--bg2); color: var(--text-muted); border: 2px solid var(--border); }
+
+/* ── Expand detail ── */
+.vcard-detail {
+  display: none;
+  border-top: 1px solid var(--border);
+}
+.vcard-detail.open { display: block; }
+.vcard-chevron {
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  flex: 0 0 auto;
+}
+.vcard-chevron.open { transform: rotate(180deg); }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+.detail-cell {
+  background: var(--card);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.detail-cell-icon {
+  font-size: 16px;
+  flex: 0 0 auto;
+}
+.detail-cell-body {
+  flex: 1;
+  min-width: 0;
+}
+.detail-cell-type {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.detail-cell-date {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-cell-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.detail-cell-badge {
+  flex: 0 0 auto;
+}
+
+/* ── Empty / loading ── */
+.exec-empty { text-align:center; padding:40px 20px; color:var(--text-muted); }
+.exec-empty-icon { font-size:40px; margin-bottom:8px; }
+.exec-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+/* dark mode badge override */
+@media (prefers-color-scheme: dark) {
+  .badge-ok   { background: #0a2e24; color: #3dffc0; border-color: #0f5c43; }
+  .badge-late { background: #2e0a0a; color: #ff8080; border-color: #5c1a1a; }
+  .badge-warn { background: #2e2400; color: #ffd166; border-color: #5c4800; }
+  .badge-appt { background: #0a1040; color: #90a8ff; border-color: #2040a0; }
+  .score-ok   { background: #0a2e24; color: #3dffc0; }
+  .score-warn { background: #2e2400; color: #ffd166; }
+  .score-bad  { background: #2e0a0a; color: #ff8080; }
+}
+</style>
+</head>
 <body>
 <div id="app">
 <div class="overlay" id="ov" onclick="closeSB()"></div>
 <nav class="sidebar" id="sb">
-  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
-  <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div></div>
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">🚗</div>
+      <div><div class="sb-logo-name">FleetSHE&amp;En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-av">—</div>
+      <div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div>
+    </div>
+  </div>
   <div class="sb-section">เมนูหลัก</div>
-  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
-  <a href="vehicles.html" class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
+  <a href="index.html"       class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
+  <a href="vehicles.html"    class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
   <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
   <div class="sb-section">ข้อมูล</div>
-  <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
-  <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
-  <a href="report.html" class="nav-item active"><span class="nav-icon">📊</span>รายงาน</a>
+  <a href="drivers.html"     class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
+  <a href="service.html"     class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
+  <a href="report.html"      class="nav-item active"><span class="nav-icon">📊</span>รายงาน</a>
   <div class="sb-spacer"></div>
   <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
 </nav>
+
 <main class="main">
   <header class="topbar">
     <button class="menu-btn" onclick="openSB()">☰</button>
-    <div class="topbar-center"><div class="topbar-title">รายงาน Audit</div></div>
+    <div class="topbar-center"><div class="topbar-title">รายงานผู้บริหาร</div></div>
     <div class="topbar-right">
       <button class="topbar-icon" onclick="exportCSV()" title="Export CSV">📥</button>
     </div>
   </header>
+
   <div class="page-body">
-    <div class="card si" style="margin-bottom:14px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="fgroup" style="margin:0"><label class="flabel">ศูนย์วิจัย</label><select class="fselect" id="rc"><option value="ALL">ทุกศูนย์</option></select></div>
-        <div class="fgroup" style="margin:0"><label class="flabel">ประเภท</label><select class="fselect" id="rt"><option value="audit">Audit ตามแผน</option></select></div>
+    <!-- Filter -->
+    <div class="filter-bar">
+      <div class="fgroup" style="margin:0">
+        <label class="flabel">ศูนย์วิจัย</label>
+        <select class="fselect" id="rc"><option value="ALL">ทุกศูนย์</option></select>
       </div>
-      <button class="btn btn-primary btn-full mt-12" onclick="loadR()">🔍 ดูรายงาน</button>
+      <button class="btn btn-primary" style="height:40px;margin-top:20px" onclick="loadR()">🔍 ดู</button>
     </div>
-    <div id="sum" style="display:none;margin-bottom:14px">
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-        <div class="kpi kpi-blue"><div class="kpi-accent"></div><div class="kpi-val" id="r0" style="font-size:24px">—</div><div class="kpi-lbl">รายการทั้งหมด</div></div>
-        <div class="kpi kpi-green"><div class="kpi-accent"></div><div class="kpi-val" id="r1" style="font-size:24px">—</div><div class="kpi-lbl">✅ ตามแผน</div></div>
-        <div class="kpi kpi-red"><div class="kpi-accent"></div><div class="kpi-val" id="r2" style="font-size:24px">—</div><div class="kpi-lbl">❌ ล่าช้า</div></div>
+
+    <!-- Hero KPI (hidden until loaded) -->
+    <div class="exec-hero" id="hero" style="display:none">
+      <div class="exec-hero-title">สรุปภาพรวม</div>
+      <div class="exec-hero-name" id="hero-center">ทุกศูนย์วิจัย</div>
+      <div class="exec-kpi-row">
+        <div class="exec-kpi">
+          <div class="exec-kpi-val c-white" id="hk-total">—</div>
+          <div class="exec-kpi-lbl">รถทั้งหมด</div>
+        </div>
+        <div class="exec-kpi">
+          <div class="exec-kpi-val c-red" id="hk-late">—</div>
+          <div class="exec-kpi-lbl">รายการล่าช้า</div>
+        </div>
+        <div class="exec-kpi">
+          <div class="exec-kpi-val c-amber" id="hk-none">—</div>
+          <div class="exec-kpi-lbl">ยังไม่เคยทำ</div>
+        </div>
+        <div class="exec-kpi">
+          <div class="exec-kpi-val c-green" id="hk-ok">—</div>
+          <div class="exec-kpi-lbl">ตามแผน</div>
+        </div>
+      </div>
+      <div class="exec-score-bar">
+        <div class="exec-score-label">
+          <span>ประสิทธิภาพบำรุงรักษา</span>
+          <span id="hk-pct">—</span>
+        </div>
+        <div class="exec-score-track">
+          <div class="exec-score-fill" id="hk-bar" style="width:0%"></div>
+        </div>
       </div>
     </div>
-    <div id="ra"><div class="empty"><div class="empty-icon">📊</div>เลือกตัวกรองแล้วกด "ดูรายงาน"</div></div>
+
+    <!-- Vehicle cards -->
+    <div id="ra">
+      <div class="exec-empty">
+        <div class="exec-empty-icon">📊</div>
+        เลือกศูนย์แล้วกด "ดู"
+      </div>
+    </div>
+    <div class="exec-note" id="export-note" style="display:none">แตะที่รถแต่ละคันเพื่อดูรายละเอียด</div>
   </div>
 </main>
+
 <nav class="bottom-nav">
-  <a href="index.html" class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
-  <a href="vehicles.html" class="bnav"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="index.html"       class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html"    class="bnav"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
   <a href="maintenance.html" class="bnav"><div class="bnav-wrap">🔧</div><span>บำรุงรักษา</span></a>
-  <a href="drivers.html" class="bnav"><div class="bnav-wrap">👤</div><span>ผู้ขับขี่</span></a>
-  <a href="report.html" class="bnav active"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
+  <a href="drivers.html"     class="bnav"><div class="bnav-wrap">👤</div><span>ผู้ขับขี่</span></a>
+  <a href="report.html"      class="bnav active"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
 </nav>
 </div>
-<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
 <script>
 var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
-var MLab={INITIAL_1000KM:'1,000 กม.',ROUTINE_10K:'10,000/6เดือน',TIRE_ROTATION:'สลับยาง',TIRE_REPLACEMENT:'เปลี่ยนยาง',BATTERY_REPLACEMENT:'แบตเตอรี่'};
-var rData=null;
+function tDate(s){
+  if(!s) return '—';
+  try { var d=new Date(s); return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543); }
+  catch(e){ return s; }
+}
 
-document.addEventListener('DOMContentLoaded',function(){
-  requireAuth();var u=Auth.getUser();
-  if(u){var i=u.name?u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'AD';document.getElementById('sb-av').textContent=i;document.getElementById('sb-nm').textContent=u.name;document.getElementById('sb-rl').textContent=roleLabel(u.role);}
-  API.call('getCenters').then(function(r){if(!r.success)return;var s=document.getElementById('rc');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
+var TYPE_ICON = {
+  INITIAL_1000KM:      '🔬',
+  ROUTINE_10K:         '🔧',
+  TIRE_ROTATION:       '🔄',
+  TIRE_REPLACEMENT:    '🛞',
+  BATTERY_REPLACEMENT: '🔋'
+};
+var TYPE_LABEL = {
+  INITIAL_1000KM:      '1,000 กม.',
+  ROUTINE_10K:         'รอบ 10,000',
+  TIRE_ROTATION:       'สลับยาง',
+  TIRE_REPLACEMENT:    'เปลี่ยนยาง',
+  BATTERY_REPLACEMENT: 'แบตเตอรี่'
+};
+
+var rData = null;
+
+document.addEventListener('DOMContentLoaded', function(){
+  requireAuth();
+  var u = Auth.getUser();
+  if(u){
+    var ini = u.name ? u.name.split(' ').map(function(w){ return w[0]; }).join('').substring(0,2) : 'AD';
+    document.getElementById('sb-av').textContent = ini;
+    document.getElementById('sb-nm').textContent = u.name;
+    document.getElementById('sb-rl').textContent = roleLabel(u.role);
+  }
+  API.call('getCenters').then(function(r){
+    if(!r.success) return;
+    var s = document.getElementById('rc');
+    r.data.forEach(function(c){
+      var o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name;
+      s.appendChild(o);
+    });
+  });
 });
 
 function loadR(){
-  document.getElementById('ra').innerHTML='<div class="loading">⏳ กำลังสร้างรายงาน...</div>';
-  document.getElementById('sum').style.display='none';
-  API.call('getAuditReport',{centerId:document.getElementById('rc').value}).then(function(r){
-    if(!r.success){document.getElementById('ra').innerHTML='<div class="empty">เกิดข้อผิดพลาด</div>';return;}
-    rData=r.data||[];renderR(rData);
+  document.getElementById('ra').innerHTML = '<div class="loading">⏳ กำลังสร้างรายงาน...</div>';
+  document.getElementById('hero').style.display = 'none';
+  document.getElementById('export-note').style.display = 'none';
+
+  var centerId = document.getElementById('rc').value;
+  var centerName = document.getElementById('rc').options[document.getElementById('rc').selectedIndex].text;
+
+  API.call('getAuditReport', { centerId: centerId }).then(function(r){
+    if(!r.success){ document.getElementById('ra').innerHTML='<div class="empty">เกิดข้อผิดพลาด</div>'; return; }
+    rData = r.data || [];
+    renderHero(rData, centerName);
+    renderCards(rData);
   });
 }
 
-function renderR(data){
-  if(!data.length){document.getElementById('ra').innerHTML='<div class="empty"><div class="empty-icon">📋</div>ไม่พบข้อมูล</div>';return;}
-  var rows=[],tot=0,ok=0,late=0;
-  data.forEach(function(v){(v.items||[]).forEach(function(it){
-    tot++;var on=it.onTime;
-    if(on===true)ok++;else late++;
-    rows.push({pl:v.plateNumber,cn:v.centerName,tp:MLab[it.type]||it.type,
-      ls:it.lastService?tDate(it.lastService):'ยังไม่เคย',
-      on:on===null?'<span class="t-muted">—</span>':on?'<span class="ok">✅ ตามแผน</span>':'<span class="late">❌ ล่าช้า</span>',
-      dd:it.delayDays>0?it.delayDays+' วัน':'—',dk:it.delayKm>0?it.delayKm+' กม.':'—'});
-  });});
-  document.getElementById('r0').textContent=tot;
-  document.getElementById('r1').textContent=ok;
-  document.getElementById('r2').textContent=late;
-  document.getElementById('sum').style.display='block';
-  document.getElementById('ra').innerHTML=
-    '<div style="overflow-x:auto;border-radius:var(--r16);border:1px solid var(--border);box-shadow:var(--sh1)">'
-    +'<table class="rtable"><thead><tr><th>ทะเบียน</th><th>ศูนย์</th><th>ประเภท</th><th>เข้ารับบริการ</th><th>ตามแผน</th><th>ล่าช้า(วัน)</th><th>ล่าช้า(กม.)</th></tr></thead>'
-    +'<tbody>'+rows.map(function(r){return'<tr><td style="font-weight:700">'+r.pl+'</td><td>'+r.cn+'</td><td>'+r.tp+'</td><td>'+r.ls+'</td><td>'+r.on+'</td><td>'+r.dd+'</td><td>'+r.dk+'</td></tr>';}).join('')
-    +'</tbody></table></div>';
+function renderHero(data, centerName){
+  var totalItems=0, okCount=0, lateCount=0, noneCount=0;
+  data.forEach(function(v){
+    (v.items||[]).forEach(function(it){
+      totalItems++;
+      if(it.onTime === true) okCount++;
+      else if(it.onTime === false) lateCount++;
+      else noneCount++;
+    });
+  });
+  var scored = okCount + lateCount;
+  var pct = scored > 0 ? Math.round(okCount / scored * 100) : null;
+
+  document.getElementById('hero-center').textContent = centerName;
+  document.getElementById('hk-total').textContent = data.length;
+  document.getElementById('hk-late').textContent  = lateCount;
+  document.getElementById('hk-none').textContent  = noneCount;
+  document.getElementById('hk-ok').textContent    = okCount;
+  document.getElementById('hk-pct').textContent   = pct !== null ? pct+'%' : '—';
+  document.getElementById('hk-bar').style.width   = (pct||0)+'%';
+  document.getElementById('hero').style.display   = 'block';
+}
+
+function renderCards(data){
+  if(!data.length){
+    document.getElementById('ra').innerHTML='<div class="exec-empty"><div class="exec-empty-icon">📋</div>ไม่พบข้อมูล</div>';
+    return;
+  }
+
+  // เรียงรถ: มี late ก่อน → warn → ok
+  data.sort(function(a,b){
+    return scoreVehicle(b) - scoreVehicle(a);
+  });
+
+  var html = '';
+  data.forEach(function(v, idx){
+    var items = v.items || [];
+    var lateItems = items.filter(function(it){ return it.onTime === false; });
+    var warnItems = items.filter(function(it){ return it.status === 'DUE_SOON'; });
+    var okItems   = items.filter(function(it){ return it.onTime === true; });
+    var noneItems = items.filter(function(it){ return it.onTime === null && it.status !== 'DUE_SOON'; });
+    var apptItems = items.filter(function(it){ return it.status === 'APPOINTED'; });
+
+    // คะแนนรถ
+    var scored = okItems.length + lateItems.length;
+    var pct = scored > 0 ? Math.round(okItems.length / scored * 100) : null;
+    var scoreClass = pct === null ? 'score-na' : pct >= 80 ? 'score-ok' : pct >= 50 ? 'score-warn' : 'score-bad';
+    var scoreText  = pct !== null ? pct+'%' : '—';
+
+    // badges สรุป
+    var badges = '';
+    if(lateItems.length) badges += '<span class="badge badge-late">❌ ล่าช้า '+lateItems.length+'</span>';
+    if(warnItems.length) badges += '<span class="badge badge-warn">⚠️ ใกล้ถึง '+warnItems.length+'</span>';
+    if(apptItems.length) badges += '<span class="badge badge-appt">📅 นัดแล้ว '+apptItems.length+'</span>';
+    if(okItems.length)   badges += '<span class="badge badge-ok">✅ '+okItems.length+'</span>';
+
+    // detail rows
+    var detailHtml = '';
+    var orderedTypes = ['INITIAL_1000KM','ROUTINE_10K','TIRE_ROTATION','TIRE_REPLACEMENT','BATTERY_REPLACEMENT'];
+    orderedTypes.forEach(function(key){
+      var it = items.find(function(x){ return x.type === key; });
+      if(!it) return;
+
+      var cellBadge='', cellSub='';
+      if(it.status === 'APPOINTED'){
+        cellBadge = '<span class="badge badge-appt">นัดแล้ว</span>';
+        cellSub   = 'รอดำเนินการ';
+      } else if(it.onTime === true){
+        cellBadge = '<span class="badge badge-ok">✅ ตามแผน</span>';
+        cellSub   = it.dueDate ? 'ครั้งถัดไป '+tDate(it.dueDate) : '';
+      } else if(it.onTime === false){
+        var delay = [];
+        if(it.delayDays > 0) delay.push('ล่าช้า '+it.delayDays+' วัน');
+        if(it.delayKm  > 0) delay.push(it.delayKm.toLocaleString()+' กม.');
+        cellBadge = '<span class="badge badge-late">❌ ล่าช้า</span>';
+        cellSub   = delay.join(' / ') || '';
+      } else if(it.status === 'OVERDUE'){
+        cellBadge = '<span class="badge badge-late">⚠️ เกินกำหนด</span>';
+        cellSub   = it.dueDate ? 'ครบ '+tDate(it.dueDate) : '';
+      } else if(it.status === 'DUE_SOON'){
+        cellBadge = '<span class="badge badge-warn">⚠️ ใกล้ถึง</span>';
+        var remind=[];
+        if(it.remainingDays != null) remind.push('อีก '+it.remainingDays+' วัน');
+        if(it.remainingKm   != null) remind.push('อีก '+it.remainingKm.toLocaleString()+' กม.');
+        cellSub = remind.join(' / ');
+      } else {
+        cellBadge = '<span class="badge badge-none">ปกติ</span>';
+        var remind=[];
+        if(it.remainingDays != null) remind.push('อีก '+it.remainingDays+' วัน');
+        if(it.remainingKm   != null) remind.push('อีก '+it.remainingKm.toLocaleString()+' กม.');
+        cellSub = remind.join(' / ') || '';
+      }
+
+      detailHtml +=
+        '<div class="detail-cell">'
+        +'<div class="detail-cell-icon">'+(TYPE_ICON[key]||'🔧')+'</div>'
+        +'<div class="detail-cell-body">'
+        +  '<div class="detail-cell-type">'+(TYPE_LABEL[key]||key)+'</div>'
+        +  '<div class="detail-cell-date">'+(it.lastService ? tDate(it.lastService) : 'ยังไม่เคยทำ')+'</div>'
+        +  (cellSub ? '<div class="detail-cell-sub">'+cellSub+'</div>' : '')
+        +'</div>'
+        +'<div class="detail-cell-badge">'+cellBadge+'</div>'
+        +'</div>';
+    });
+
+    html +=
+      '<div class="vcard" id="vc-'+idx+'">'
+      +'<div class="vcard-header" onclick="toggleCard('+idx+')">'
+      +  '<div class="vcard-plate">'+v.plateNumber+'</div>'
+      +  '<div class="vcard-info">'
+      +    '<div class="vcard-model">'+(v.brand||'')+' '+(v.model||'')+'</div>'
+      +    '<div class="vcard-center">'+(v.centerName||'')+'</div>'
+      +  '</div>'
+      +  '<div class="vcard-badges">'+badges+'</div>'
+      +  '<div class="score-circle '+scoreClass+'" title="คะแนน">'+scoreText+'</div>'
+      +  '<div class="vcard-chevron" id="ch-'+idx+'">▾</div>'
+      +'</div>'
+      +'<div class="vcard-detail" id="vd-'+idx+'">'
+      +  '<div class="detail-grid">'+detailHtml+'</div>'
+      +'</div>'
+      +'</div>';
+  });
+
+  document.getElementById('ra').innerHTML = html;
+  document.getElementById('export-note').style.display = 'block';
+}
+
+function scoreVehicle(v){
+  var items = v.items || [];
+  var late = items.filter(function(it){ return it.onTime===false; }).length;
+  var warn = items.filter(function(it){ return it.status==='DUE_SOON'; }).length;
+  return late * 10 + warn;
+}
+
+function toggleCard(idx){
+  var detail = document.getElementById('vd-'+idx);
+  var chev   = document.getElementById('ch-'+idx);
+  detail.classList.toggle('open');
+  chev.classList.toggle('open');
 }
 
 function exportCSV(){
-  if(!rData){alert('กรุณาโหลดรายงานก่อน');return;}
-  var rows=[['ทะเบียน','ศูนย์','ประเภท','เข้ารับบริการ','ตามแผน','ล่าช้า(วัน)','ล่าช้า(กม.)']];
-  rData.forEach(function(v){(v.items||[]).forEach(function(it){rows.push([v.plateNumber,v.centerName,MLab[it.type]||it.type,it.lastService?tDate(it.lastService):'ยังไม่เคย',it.onTime===null?'—':it.onTime?'ตามแผน':'ล่าช้า',it.delayDays>0?it.delayDays:'—',it.delayKm>0?it.delayKm:'—']);});});
-  var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='fleet_audit_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  if(!rData){ alert('กรุณาโหลดรายงานก่อน'); return; }
+  var rows=[['ทะเบียน','ยี่ห้อ/รุ่น','ศูนย์','ประเภท','เข้ารับบริการล่าสุด','สถานะ','ล่าช้า(วัน)','ล่าช้า(กม.)']];
+  rData.forEach(function(v){
+    (v.items||[]).forEach(function(it){
+      rows.push([
+        v.plateNumber,
+        (v.brand||'')+' '+(v.model||''),
+        v.centerName,
+        TYPE_LABEL[it.type]||it.type,
+        it.lastService ? tDate(it.lastService) : 'ยังไม่เคย',
+        it.onTime===null ? (it.status==='DUE_SOON'?'ใกล้ถึง':'ยังไม่ทำ') : it.onTime ? 'ตามแผน' : 'ล่าช้า',
+        it.delayDays > 0 ? it.delayDays : '—',
+        it.delayKm   > 0 ? it.delayKm   : '—'
+      ]);
+    });
+  });
+  var csv = rows.map(function(r){
+    return r.map(function(c){ return '"'+String(c||'').replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\n');
+  var b = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'fleet_report_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
 }
-function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
-function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
+
+function openSB(){ document.getElementById('sb').classList.add('open'); document.getElementById('ov').classList.add('show'); }
+function closeSB(){ document.getElementById('sb').classList.remove('open'); document.getElementById('ov').classList.remove('show'); }
 </script>
 </body>
 </html>

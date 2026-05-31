@@ -190,6 +190,16 @@ function renderMaint(list){
   if(!list.length){el.innerHTML='<div class="empty">ไม่มีข้อมูล</div>';return;}
   var order={OVERDUE:0,DUE_SOON:1,APPOINTED:2,NORMAL:3,COMPLETED:4};
   list.sort(function(a,b){return(order[a.status]||5)-(order[b.status]||5);});
+
+  // รายการที่ทำ pre-defined ตามประเภท
+  var TASKS_PRESET = {
+    INITIAL_1000KM:      ['ตรวจเช็กระยะ 1,000 กม.แรก','เปลี่ยนน้ำมันเครื่อง','ตรวจสอบระดับน้ำมันเบรก','ตรวจสอบยางรถยนต์','ตรวจสอบแบตเตอรี่'],
+    ROUTINE_10K:         ['ตรวจเช็กตามระยะ 10,000 กม.','เปลี่ยนน้ำมันเครื่อง','เปลี่ยนไส้กรองน้ำมันเครื่อง','ตรวจเช็ก 20 รายการ','ตรวจสอบระบบเบรก','ตรวจสอบระบบไฟ'],
+    TIRE_ROTATION:       ['สลับยาง 4 เส้น','ตรวจสอบแรงดันลมยาง','ตรวจสอบดอกยาง','ตรวจสอบน็อตล้อ'],
+    TIRE_REPLACEMENT:    ['เปลี่ยนยาง 4 เส้น','ตรวจสอบแรงดันลมยาง','ตั้งศูนย์ล้อ','ถ่วงล้อ'],
+    BATTERY_REPLACEMENT: ['เปลี่ยนแบตเตอรี่','ตรวจสอบขั้วแบตเตอรี่','ทดสอบกระแสไฟ']
+  };
+
   el.innerHTML=list.filter(function(m){return m.status!=='COMPLETED';}).map(function(m){
     var s=m.status;
     var co={OVERDUE:'var(--danger)',DUE_SOON:'var(--warning)',APPOINTED:'var(--p600)',NORMAL:'var(--success)'};
@@ -200,6 +210,15 @@ function renderMaint(list){
     var pct=m.dueMileage?Math.min(100,Math.round(km/m.dueMileage*100)):0;
     var pc=pct>=100?'pf-red':pct>=85?'pf-orange':'pf-blue';
     var canWrite = typeof Auth !== 'undefined' && Auth.canWrite ? Auth.canWrite() : true;
+
+    // สร้าง checklist รายการ
+    var presets = TASKS_PRESET[m.type] || [];
+    var checklistHtml = presets.map(function(task,i){
+      return '<label style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-light);cursor:pointer;font-size:13px;color:var(--t1)">'
+        +'<input type="checkbox" id="sr-chk-'+m.type+'-'+i+'" value="'+task+'" '+(i===0?'checked':'')+' onchange="updateTasksField(\''+m.type+'\')" style="width:16px;height:16px;cursor:pointer;accent-color:var(--p600)">'
+        +task+'</label>';
+    }).join('');
+
     return '<div class="mcard mcard-'+(s==='OVERDUE'?'red':s==='DUE_SOON'?'orange':s==='APPOINTED'?'blue':'green')+'">'
       +'<div class="mcard-stripe"></div>'
       +'<div class="mcard-head">'
@@ -214,24 +233,28 @@ function renderMaint(list){
         +'<div style="font-size:10px;color:var(--t3);margin-top:3px">'+Number(km).toLocaleString()+' / '+Number(m.dueMileage).toLocaleString()+' กม.</div></div>'
         +(m.dueDate?'<div><div class="dp-lbl">ครบกำหนด</div><div style="font-size:13px;font-weight:600;margin-top:6px;color:'+co[s]+'">'+tDate(m.dueDate)+'</div></div>':'')
         +'</div>':'')
-      // ── [ข้อ 5] บันทึก service record ──
+      // ── บันทึก service record ──
       +(canWrite?'<div class="appt-box" style="margin-top:10px">'
         +'<div class="appt-lbl">✅ บันทึกเข้ารับบริการ</div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
         +'<div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">วันที่เข้ารับบริการ</div>'
         +'<input type="date" id="sr-date-'+m.type+'" class="finput" style="font-size:13px"></div>'
         +'<div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">เลขไมล์ (กม.)</div>'
         +'<input type="number" id="sr-km-'+m.type+'" class="finput" style="font-size:13px" placeholder="กรอกเลขไมล์" value="'+(VD?VD.current_mileage:'')+'"></div>'
         +'</div>'
-        +'<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">รายการที่ทำ</div>'
-        +'<input type="text" id="sr-tasks-'+m.type+'" class="finput" style="font-size:13px" placeholder="เช่น เปลี่ยนน้ำมันเครื่อง, ตรวจเช็ก 20 รายการ"></div>'
+        // checklist
+        +(presets.length?'<div style="margin-bottom:10px">'
+          +'<div style="font-size:11px;color:var(--t3);margin-bottom:6px">รายการที่ทำ (เลือกได้หลายรายการ)</div>'
+          +'<div style="background:var(--bg);border-radius:8px;padding:4px 10px">'+checklistHtml+'</div>'
+          +'<div style="margin-top:6px"><input type="text" id="sr-tasks-'+m.type+'" class="finput" style="font-size:12px" placeholder="หรือพิมพ์เพิ่มเติม..."></div>'
+          +'</div>':'')
         +'<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">หมายเหตุ</div>'
         +'<input type="text" id="sr-note-'+m.type+'" class="finput" style="font-size:13px" placeholder="ไม่บังคับ"></div>'
         +'<div style="display:flex;gap:8px">'
         +'<button class="btn btn-primary btn-sm" style="flex:1" onclick="saveServiceRecord(\''+m.type+'\',true)">💾 บันทึก + ปิดนัด</button>'
         +'<button class="btn btn-secondary btn-sm" onclick="saveServiceRecord(\''+m.type+'\',false)">บันทึก</button>'
         +'</div></div>':'')
-      // ── นัดหมาย ──
+      // นัดหมาย
       +(canWrite && s!=='APPOINTED'?'<div class="appt-box"><div class="appt-lbl">📅 ตั้งวันนัดหมาย</div>'
         +'<div style="display:flex;gap:8px;align-items:center">'
         +'<input type="date" id="a-'+m.type+'" class="finput" style="flex:1">'
@@ -240,12 +263,30 @@ function renderMaint(list){
       +'</div></div>';
   }).join('');
 
-  // ตั้งค่า default date วันนี้
+  // ตั้งค่า default วันนี้ + sync tasks field จาก checklist
   list.forEach(function(m){
     var dateEl = document.getElementById('sr-date-'+m.type);
     if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().split('T')[0];
+    updateTasksField(m.type);
   });
 }
+
+// sync checklist → tasks field
+function updateTasksField(type){
+  var checked = [];
+  document.querySelectorAll('[id^="sr-chk-'+type+'-"]').forEach(function(chk){
+    if(chk.checked) checked.push(chk.value);
+  });
+  var extraEl = document.getElementById('sr-tasks-'+type);
+  if(extraEl && !extraEl._userTyped) extraEl.placeholder = checked.length ? checked.join(', ') : 'หรือพิมพ์เพิ่มเติม...';
+}
+
+// เมื่อ user พิมพ์เองใน tasks field ให้ mark ว่า user typed
+document.addEventListener('input', function(e){
+  if(e.target && e.target.id && e.target.id.startsWith('sr-tasks-')){
+    e.target._userTyped = e.target.value.length > 0;
+  }
+});
 
 function saveServiceRecord(type, closeAppt){
   var dateEl  = document.getElementById('sr-date-'+type);
@@ -255,20 +296,27 @@ function saveServiceRecord(type, closeAppt){
 
   var servicedAt = dateEl ? dateEl.value : '';
   var km         = kmEl   ? parseInt(kmEl.value) || 0 : 0;
-  var tasks      = tasksEl ? tasksEl.value.trim() : '';
-  var note       = noteEl  ? noteEl.value.trim()  : '';
+  var note       = noteEl  ? noteEl.value.trim() : '';
+
+  // รวม checklist + typed text เป็น tasks
+  var checked = [];
+  document.querySelectorAll('[id^="sr-chk-'+type+'-"]').forEach(function(chk){
+    if(chk.checked) checked.push(chk.value);
+  });
+  var extra  = tasksEl && tasksEl._userTyped ? tasksEl.value.trim() : '';
+  var tasks  = checked.concat(extra ? [extra] : []).join(', ');
 
   if(!servicedAt){ alert('กรุณาเลือกวันที่เข้ารับบริการ'); return; }
   if(!km){ alert('กรุณากรอกเลขไมล์'); return; }
 
   API.post('addServiceRecord', {
-    vehicleId:          VID,
-    maintenanceType:    type,
-    servicedAt:         servicedAt,
-    mileageAtService:   km,
-    tasks:              tasks,
-    notes:              note,
-    appointmentClosed:  closeAppt ? 'true' : 'false'
+    vehicleId:         VID,
+    maintenanceType:   type,
+    servicedAt:        servicedAt,
+    mileageAtService:  km,
+    tasks:             tasks,
+    notes:             note,
+    appointmentClosed: closeAppt ? 'true' : 'false'
   }).then(function(r){
     if(r.success){
       localStorage.setItem('fleet-data-updated', Date.now());

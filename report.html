@@ -86,34 +86,54 @@
 .rpt-empty{text-align:center;padding:40px 20px;color:var(--t3);}
 .rpt-empty-icon{font-size:40px;margin-bottom:8px;opacity:.5;}
 
-/* ══ Print — timeline สวยงาม ══ */
+/* ══ Print — timeline สวยงามมีสี ══ */
 @media print{
   .topbar,.sidebar,.bottom-nav,.overlay,.export-row,.rpt-tabs,.vsel-grid,.vsel-card{display:none!important;}
   .main{margin-left:0!important;padding-bottom:0!important;}
   body{background:#fff!important;color:#000!important;font-size:11px;}
 
   /* header */
-  .rpt-header{border:1.5px solid #dde3ee!important;box-shadow:none!important;page-break-inside:avoid;}
-  .rpt-plate-box{background:#f5f5f5!important;border:1px solid #ccc!important;}
+  .rpt-header{border:1.5px solid #dde3ee!important;box-shadow:none!important;page-break-inside:avoid;margin-bottom:20px!important;}
+  .rpt-plate-box{background:#f0f4ff!important;border:2px solid #0B5ED7!important;color:#0B5ED7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .rpt-model{font-size:15px!important;font-weight:700!important;}
 
-  /* แสดง tab ประวัติเป็น print timeline */
+  /* แสดง tab ประวัติ */
   #tab-hist{display:block!important;}
   #tab-plan{display:none!important;}
   #tab-sum{display:none!important;}
-
-  /* print title */
   #print-title{display:block!important;}
 
-  /* timeline */
-  .tl-item{page-break-inside:avoid;}
-  .tl-dot{border:2px solid #fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .tl-badge-done{background:#EDFAF3!important;color:#1C8A45!important;border:1px solid #A3E4BF!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .tl-badge-late{background:#FEF0EF!important;color:#E5322D!important;border:1px solid #FBCFCE!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .tl-tasks{background:#f9f9f9!important;border-left:3px solid #ccc!important;}
-  .tl-km{background:#f5f5f5!important;border:1px solid #ddd!important;}
-  .tl-line{background:#ddd!important;}
+  /* timeline สี */
+  .tl-item{page-break-inside:avoid;margin-bottom:4px;}
+  .tl-dot{-webkit-print-color-adjust:exact;print-color-adjust:exact;border:2px solid #fff!important;}
+  .tl-line{background:#dde3ee!important;}
 
-  @page{margin:15mm;size:A4;}
+  /* badge สี */
+  .tl-badge-done{
+    background:#EDFAF3!important;color:#1C8A45!important;
+    border:1px solid #A3E4BF!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .tl-badge-late{
+    background:#FEF0EF!important;color:#E5322D!important;
+    border:1px solid #FBCFCE!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+
+  /* tasks box */
+  .tl-tasks{
+    background:#f8f9ff!important;
+    border-left:3px solid #0B5ED7!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .tl-km{background:#f0f4ff!important;border:1px solid #c0d9fa!important;color:#0B5ED7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .tl-date{color:#666!important;}
+  .tl-title{font-size:13px!important;font-weight:700!important;}
+
+  /* donut ใน header */
+  #rpt-donut-arc{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+  @page{margin:12mm 15mm;size:A4;}
 }
 
 /* print title — hidden on screen */
@@ -371,14 +391,13 @@ function selectVehicle(idx){
   document.getElementById('sum-list').innerHTML  = '';
   document.getElementById('rpt-donut-arc').setAttribute('stroke-dasharray','0 150.8');
 
-  // [FIX-SCROLL] scroll ไป rpt-area โดย offset topbar
+  // [FIX-SCROLL] scroll ไป rpt-area โดย offset topbar + padding
   setTimeout(function(){
-    var el = document.getElementById('rpt-area');
-    var topbar = document.querySelector('.topbar');
-    var topH = topbar ? topbar.offsetHeight : 56;
-    var y = el.getBoundingClientRect().top + window.pageYOffset - topH - 8;
-    window.scrollTo({top: y, behavior: 'smooth'});
-  }, 50);
+    var el    = document.getElementById('rpt-area');
+    var topH  = (document.querySelector('.topbar') || {offsetHeight:56}).offsetHeight;
+    var y = el.getBoundingClientRect().top + window.pageYOffset - topH - 12;
+    window.scrollTo({top: Math.max(0, y), behavior: 'smooth'});
+  }, 80);
 
   Promise.all([
     API.call('getVehicle', {id: v.id}),

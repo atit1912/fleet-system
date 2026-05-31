@@ -82,6 +82,15 @@ document.addEventListener('DOMContentLoaded',function(){
     document.getElementById('h-sub').textContent=roleLabel(u.role)+(u.centerName?' · '+u.centerName:'');
   }
   loadCenters();loadDash();
+  // [FIX] auto-refresh เมื่อ tab กลับมา focus หลังมีการอัปเดตข้อมูล
+  window.addEventListener('focus', function(){
+    var lastUpdate = parseInt(localStorage.getItem('fleet-data-updated') || '0');
+    var lastCheck  = parseInt(localStorage.getItem('fleet-last-check')   || '0');
+    if(lastUpdate > lastCheck){
+      localStorage.setItem('fleet-last-check', Date.now());
+      loadDash();
+    }
+  });
 });
 function loadCenters(){API.call('getCenters').then(function(r){if(!r.success)return;var s=document.getElementById('cf');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});});}
 function loadDash(){

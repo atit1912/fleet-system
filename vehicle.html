@@ -235,7 +235,13 @@ function saveMile(){
   var n=document.getElementById('mn').value;
   if(!m||m<0){alert('กรุณากรอกเลขไมล์');return;}
   API.post('updateMileage',{vehicleId:VID,mileage:m,recordedAt:d,note:n})
-    .then(function(r){if(r.success){alert('บันทึกสำเร็จ ✅');loadV();}});
+    .then(function(r){
+      if(r.success){
+        localStorage.setItem('fleet-data-updated', Date.now());
+        alert('บันทึกสำเร็จ ✅');
+        loadV();
+      }
+    });
 }
 
 function showT(id,el){

@@ -72,6 +72,16 @@ document.addEventListener("DOMContentLoaded",function(){
     allVehicles.forEach(function(v){var o=document.createElement("option");o.value=v.id;o.textContent=v.plate_number+" ("+v.center_name+")";sel.appendChild(o);});
   });
   loadRecs();
+
+  // [FIX] auto-refresh เมื่อ tab กลับมา focus หลังมีการอัปเดตข้อมูล
+  window.addEventListener('focus', function(){
+    var lastUpdate = parseInt(localStorage.getItem('fleet-data-updated') || '0');
+    var lastCheck  = parseInt(localStorage.getItem('fleet-last-check')   || '0');
+    if(lastUpdate > lastCheck){
+      localStorage.setItem('fleet-last-check', Date.now());
+      loadRecs();
+    }
+  });
 });
 function loadRecs(){
   var vid=document.getElementById("vf").value;

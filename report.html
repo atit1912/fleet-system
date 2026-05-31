@@ -281,6 +281,16 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
   loadVehicles();
+
+  // [FIX] auto-refresh เมื่อ tab กลับมา focus หลังมีการอัปเดตข้อมูล
+  window.addEventListener('focus', function(){
+    var lastUpdate = parseInt(localStorage.getItem('fleet-data-updated') || '0');
+    var lastCheck  = parseInt(localStorage.getItem('fleet-last-check')   || '0');
+    if(lastUpdate > lastCheck){
+      localStorage.setItem('fleet-last-check', Date.now());
+      loadVehicles();
+    }
+  });
 });
 
 /* ══ โหลดรายการรถ ══ */

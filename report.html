@@ -95,7 +95,10 @@
   /* header */
   .rpt-header{border:1.5px solid #dde3ee!important;box-shadow:none!important;page-break-inside:avoid;margin-bottom:20px!important;}
   .rpt-plate-box{background:#f0f4ff!important;border:2px solid #0B5ED7!important;color:#0B5ED7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .rpt-model{font-size:15px!important;font-weight:700!important;}
+  .rpt-model{font-size:15px!important;font-weight:700!important;color:#000!important;}
+  .rpt-center{color:#444!important;}
+  .rpt-donut-pct{color:#000!important;}
+  .rpt-donut-lbl{color:#666!important;}
 
   /* แสดง tab ประวัติ */
   #tab-hist{display:block!important;}
@@ -103,10 +106,12 @@
   #tab-sum{display:none!important;}
   #print-title{display:block!important;}
 
-  /* timeline สี */
+  /* timeline */
   .tl-item{page-break-inside:avoid;margin-bottom:4px;}
   .tl-dot{-webkit-print-color-adjust:exact;print-color-adjust:exact;border:2px solid #fff!important;}
   .tl-line{background:#dde3ee!important;}
+  .tl-date{color:#666!important;}
+  .tl-title{color:#000!important;font-size:13px!important;}
 
   /* badge สี */
   .tl-badge-done{
@@ -120,17 +125,21 @@
     -webkit-print-color-adjust:exact;print-color-adjust:exact;
   }
 
-  /* tasks box */
+  /* tasks box — แก้ตัวหนังสือจาง */
   .tl-tasks{
     background:#f8f9ff!important;
     border-left:3px solid #0B5ED7!important;
+    color:#222!important;           /* ← แก้จาง */
+    font-size:11px!important;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;
   }
-  .tl-km{background:#f0f4ff!important;border:1px solid #c0d9fa!important;color:#0B5ED7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .tl-date{color:#666!important;}
-  .tl-title{font-size:13px!important;font-weight:700!important;}
+  .tl-km{
+    background:#f0f4ff!important;border:1px solid #c0d9fa!important;
+    color:#0B5ED7!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
 
-  /* donut ใน header */
+  /* donut */
   #rpt-donut-arc{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 
   @page{margin:12mm 15mm;size:A4;}
@@ -177,7 +186,7 @@
     </div>
   </header>
 
-  <div class="page-body">
+  <div class="page-body" style="padding-bottom:calc(var(--nav-h) + 24px)">
 
     <!-- Filter + Export -->
     <div class="export-row">

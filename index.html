@@ -5,6 +5,9 @@
 <title>Intelligent Fleet SHE&amp;En — Dashboard</title>
 <script src="theme.js"></script>
 <link rel="stylesheet" href="style.css">
+<style>
+@media(min-width:480px){.kpi-grid{grid-template-columns:repeat(5,1fr);}}
+</style>
 </head>
 <body>
 <div id="app">
@@ -20,7 +23,7 @@
   <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
   <div class="sb-section">ข้อมูล</div>
   <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
-  <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติซ่อม</a>
+  <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติการเข้ารับบริการ</a>
   <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
   <div class="sb-spacer"></div>
   <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
@@ -46,6 +49,7 @@
       <div class="kpi kpi-red fu fu1"><div class="kpi-accent"></div><div class="kpi-icon-box">⚠️</div><div class="kpi-val" id="k1">—</div><div class="kpi-lbl">เกินกำหนด</div></div>
       <div class="kpi kpi-orange fu fu2"><div class="kpi-accent"></div><div class="kpi-icon-box">⏰</div><div class="kpi-val" id="k2">—</div><div class="kpi-lbl">ใกล้ครบกำหนด</div></div>
       <div class="kpi kpi-green fu fu3"><div class="kpi-accent"></div><div class="kpi-icon-box">✅</div><div class="kpi-val" id="k3">—</div><div class="kpi-lbl">ปกติ</div></div>
+      <div class="kpi kpi-blue fu fu4"><div class="kpi-accent"></div><div class="kpi-icon-box">📅</div><div class="kpi-val" id="k4">—</div><div class="kpi-lbl">นัดหมาย</div></div>
     </div>
     <div class="sec-row"><span class="sec-title">รายการที่ต้องดำเนินการ</span><a href="vehicles.html" class="sec-more">ดูทั้งหมด →</a></div>
     <div id="ulist"><div class="loading">⏳ กำลังโหลดข้อมูล...</div></div>
@@ -89,7 +93,8 @@ function loadDash(){
     document.getElementById('k0').textContent=s.total||0;
     document.getElementById('k1').textContent=s.overdue||0;
     document.getElementById('k2').textContent=s.dueSoon||0;
-    document.getElementById('k3').textContent=(s.normal||0)+(s.appointed>0?' (+'+s.appointed+')':'');
+    document.getElementById('k3').textContent=s.normal||0;
+    document.getElementById('k4').textContent=s.appointed||0;
     renderU(r.urgentList||[]);
   }).catch(noData);
 }

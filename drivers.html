@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="th">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — ผู้ขับขี่</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Intelligent Fleet SHE&amp;En — ผู้ขับขี่</title><script src="theme.js"></script>
+<link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="app">
 <div class="overlay" id="ov" onclick="closeSB()"></div>
 <nav class="sidebar" id="sb">
-  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
+  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">Intelligent Fleet</div><div class="sb-logo-sub">SHE&amp;En Management</div></div></div>
   <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div></div>
   <div class="sb-section">เมนูหลัก</div>
   <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
@@ -22,7 +23,8 @@
   <header class="topbar">
     <button class="menu-btn" onclick="openSB()">☰</button>
     <div class="topbar-center"><div class="topbar-title">ผู้ขับขี่</div></div>
-    <div class="topbar-right"><select class="center-sel" id="cf" onchange="loadDr()"><option value="ALL">ทุกศูนย์</option></select></div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="Theme.toggle()">🌙</button><select class="center-sel" id="cf" onchange="loadDr()"><option value="ALL">ทุกศูนย์</option></select></div>
   </header>
   <div class="page-body">
     <div id="dl"><div class="loading">⏳ กำลังโหลด...</div></div>
@@ -38,48 +40,41 @@
 </div>
 <script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
-var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
-document.addEventListener('DOMContentLoaded',function(){
+var MS=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+function tDate(s){if(!s)return"—";try{var d=new Date(s);return d.getDate()+" "+MS[d.getMonth()]+" "+(d.getFullYear()+543);}catch(e){return s;}}
+document.addEventListener("DOMContentLoaded",function(){
   requireAuth();var u=Auth.getUser();
-  if(u){var i=u.name?u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'AD';document.getElementById('sb-av').textContent=i;document.getElementById('sb-nm').textContent=u.name;document.getElementById('sb-rl').textContent=roleLabel(u.role);}
-  API.call('getCenters').then(function(r){if(!r.success)return;var s=document.getElementById('cf');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
+  if(u){var i=u.name?u.name.split(" ").map(function(w){return w[0];}).join("").substring(0,2):"AD";document.getElementById("sb-av").textContent=i;document.getElementById("sb-nm").textContent=u.name;document.getElementById("sb-rl").textContent=roleLabel(u.role);}
+  API.call("getCenters").then(function(r){if(!r.success)return;var s=document.getElementById("cf");r.data.forEach(function(c){var o=document.createElement("option");o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
   loadDr();
 });
 function loadDr(){
-  document.getElementById('dl').innerHTML='<div class="loading">⏳ กำลังโหลด...</div>';
-  API.call('getDrivers',{centerId:document.getElementById('cf').value==='ALL'?null:document.getElementById('cf').value}).then(function(r){
+  document.getElementById("dl").innerHTML="<div class='loading'>⏳ กำลังโหลด...</div>";
+  API.call("getDrivers",{centerId:document.getElementById("cf").value==="ALL"?null:document.getElementById("cf").value}).then(function(r){
     renderDr(r.success?r.data||[]:[]);
   }).catch(function(){renderDr([]);});
 }
 function renderDr(list){
-  var el=document.getElementById('dl');
-  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">👤</div>ไม่พบข้อมูลผู้ขับขี่<br><small style="color:var(--t4)">กรุณากรอกข้อมูลในตาราง drivers</small></div>';return;}
+  var el=document.getElementById("dl");
+  if(!list.length){el.innerHTML="<div class='empty'><div class='empty-icon'>👤</div>ไม่พบข้อมูลผู้ขับขี่</div>";return;}
   el.innerHTML=list.map(function(d,i){
-    var ls=d.licenseStatus||'NO_LICENSE';
-    var lb=ls==='EXPIRED'?'<span class="badge b-red">ใบขับขี่หมดอายุ</span>':ls==='EXPIRING_SOON'?'<span class="badge b-orange">ใกล้หมด</span>':ls==='VALID'?'<span class="badge b-green">ปกติ</span>':'<span class="badge" style="background:var(--bg);color:var(--t4);border:1px solid var(--border)">ไม่มีข้อมูล</span>';
-    var cc=ls==='EXPIRED'?'vcard-red':ls==='EXPIRING_SOON'?'vcard-orange':'vcard-green';
-    var ini=d.name?d.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'??';
-    return '<div class="vcard '+cc+' fu'+(i<4?' fu'+(i+1):'')+'">'
-      +'<div class="vcard-stripe"></div><div class="vcard-body">'
-      +'<div class="vcard-row">'
-      +'<div style="display:flex;align-items:center;gap:10px">'
-      +'<div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">'+ini+'</div>'
-      +'<div><div class="vcard-plate">'+d.name+'</div><div class="vcard-model">'+(d.department||'—')+' · '+(d.center_name||'')+'</div></div>'
-      +'</div>'+lb+'</div>'
-      +(d.phone?'<div class="vcard-meta" style="margin-top:6px">📞 '+d.phone+'</div>':'')
-      +(d.licenses&&d.licenses.length?'<div class="vcard-meta" style="margin-top:4px">🪪 '+d.licenses.map(function(l){return(l.type==='PERSONAL'?'ส่วนตัว':'ราชการ')+': '+tDate(l.expires_at);}).join(' · ')+'</div>':'')
-      +'</div></div>';
-  }).join('');
+    var ls=d.licenseStatus||"NO_LICENSE";
+    var lb=ls==="EXPIRED"?"<span class='badge b-red'>ใบขับขี่หมดอายุ</span>":ls==="EXPIRING_SOON"?"<span class='badge b-orange'>ใกล้หมด</span>":ls==="VALID"?"<span class='badge b-green'>ปกติ</span>":"<span class='badge' style='background:var(--bg);color:var(--t4);border:1px solid var(--border)'>ไม่มีข้อมูล</span>";
+    var cc=ls==="EXPIRED"?"vcard-red":ls==="EXPIRING_SOON"?"vcard-orange":"vcard-green";
+    var ini=d.name?d.name.split(" ").map(function(w){return w[0];}).join("").substring(0,2):"??";
+    return "<div class='vcard "+cc+" fu"+(i<4?" fu"+(i+1):"")+"'>"
+      +"<div class='vcard-stripe'></div><div class='vcard-body'>"
+      +"<div class='vcard-row'>"
+      +"<div style='display:flex;align-items:center;gap:10px'>"
+      +"<div style='width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0'>"+ini+"</div>"
+      +"<div><div class='vcard-plate'>"+d.name+"</div><div class='vcard-model'>"+(d.department||"—")+" · "+(d.center_name||"")+"</div></div>"
+      +"</div>"+lb+"</div>"
+      +(d.phone?"<div class='vcard-meta' style='margin-top:6px'>📞 "+d.phone+"</div>":"")
+      +"</div></div>";
+  }).join("");
 }
-function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
-function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
+function openSB(){document.getElementById("sb").classList.add("open");document.getElementById("ov").classList.add("show");}
+function closeSB(){document.getElementById("sb").classList.remove("open");document.getElementById("ov").classList.remove("show");}
 </script>
 </body>
 </html>
-
-<!-- ใน <head> — ใส่ก่อน style.css เพื่อป้องกัน flash -->
-<script src="theme.js"></script>
-
-<!-- ใน topbar — เพิ่ม toggle button ข้างๆ topbar-icon -->
-<button class="theme-toggle" onclick="Theme.toggle()">🌙</button>

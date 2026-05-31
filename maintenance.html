@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="th">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — บำรุงรักษา</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Intelligent Fleet SHE&amp;En — บำรุงรักษา</title><script src="theme.js"></script>
+<link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="app">
 <div class="overlay" id="ov" onclick="closeSB()"></div>
 <nav class="sidebar" id="sb">
-  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
+  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">Intelligent Fleet</div><div class="sb-logo-sub">SHE&amp;En Management</div></div></div>
   <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div></div>
   <div class="sb-section">เมนูหลัก</div>
   <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
@@ -22,7 +23,8 @@
   <header class="topbar">
     <button class="menu-btn" onclick="openSB()">☰</button>
     <div class="topbar-center"><div class="topbar-title">รอบบำรุงรักษา</div></div>
-    <div class="topbar-right"><select class="center-sel" id="cf" onchange="loadD()"><option value="ALL">ทุกศูนย์</option></select></div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="Theme.toggle()">🌙</button><select class="center-sel" id="cf" onchange="loadD()"><option value="ALL">ทุกศูนย์</option></select></div>
   </header>
   <div class="page-body">
     <div class="filter-row">
@@ -85,8 +87,3 @@ function closeSB(){document.getElementById('sb').classList.remove('open');docume
 </script>
 </body>
 </html>
-<!-- ใน <head> — ใส่ก่อน style.css เพื่อป้องกัน flash -->
-<script src="theme.js"></script>
-
-<!-- ใน topbar — เพิ่ม toggle button ข้างๆ topbar-icon -->
-<button class="theme-toggle" onclick="Theme.toggle()">🌙</button>

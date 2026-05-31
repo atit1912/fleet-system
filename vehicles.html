@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — รถยนต์</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Intelligent Fleet SHE&amp;En — รถยนต์</title><script src="theme.js"></script>
+<link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="app">
 <div class="overlay" id="ov" onclick="closeSB()"></div>
 <nav class="sidebar" id="sb">
   <div class="sb-header">
-    <div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
+    <div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">Intelligent Fleet</div><div class="sb-logo-sub">SHE&amp;En Management</div></div></div>
     <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div>
   </div>
   <div class="sb-section">เมนูหลัก</div>
@@ -25,6 +26,7 @@
     <button class="menu-btn" onclick="openSB()">☰</button>
     <div class="topbar-center"><div class="topbar-title">รถยนต์ทั้งหมด</div></div>
     <div class="topbar-right">
+      <button class="theme-toggle" onclick="Theme.toggle()">🌙</button>
       <select class="center-sel" id="cf" onchange="loadV()"><option value="ALL">ทุกศูนย์</option></select>
     </div>
   </header>
@@ -90,8 +92,3 @@ function closeSB(){document.getElementById('sb').classList.remove('open');docume
 </script>
 </body>
 </html>
-<!-- ใน <head> — ใส่ก่อน style.css เพื่อป้องกัน flash -->
-<script src="theme.js"></script>
-
-<!-- ใน topbar — เพิ่ม toggle button ข้างๆ topbar-icon -->
-<button class="theme-toggle" onclick="Theme.toggle()">🌙</button>

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="th">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>FleetSHE&En — ประวัติซ่อม</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Intelligent Fleet SHE&amp;En — ประวัติซ่อม</title><script src="theme.js"></script>
+<link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="app">
 <div class="overlay" id="ov" onclick="closeSB()"></div>
 <nav class="sidebar" id="sb">
-  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">FleetSHE&En</div><div class="sb-logo-sub">ระบบบริหารรถยนต์</div></div></div>
+  <div class="sb-header"><div class="sb-logo"><div class="sb-logo-mark">🚗</div><div><div class="sb-logo-name">Intelligent Fleet</div><div class="sb-logo-sub">SHE&amp;En Management</div></div></div>
   <div class="sb-user"><div class="sb-avatar" id="sb-av">—</div><div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div></div></div>
   <div class="sb-section">เมนูหลัก</div>
   <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
@@ -23,19 +24,13 @@
     <button class="menu-btn" onclick="openSB()">☰</button>
     <div class="topbar-center"><div class="topbar-title">ประวัติเข้ารับบริการ</div></div>
     <div class="topbar-right">
+      <button class="theme-toggle" onclick="Theme.toggle()">🌙</button>
       <select class="center-sel" id="cf" onchange="loadRecs()"><option value="ALL">ทุกศูนย์</option></select>
     </div>
   </header>
   <div class="page-body">
-    <!-- filter ตามทะเบียน -->
-    <div class="fgroup">
-      <select class="fselect" id="vf" onchange="loadRecs()">
-        <option value="ALL">— รถทุกคัน —</option>
-      </select>
-    </div>
-    <!-- summary strip -->
+    <div class="fgroup"><select class="fselect" id="vf" onchange="loadRecs()"><option value="ALL">— รถทุกคัน —</option></select></div>
     <div id="sum-strip" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;"></div>
-    <!-- list -->
     <div id="rl"><div class="loading">⏳ กำลังโหลด...</div></div>
   </div>
 </main>
@@ -47,10 +42,10 @@
   <a href="report.html" class="bnav"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
 </nav>
 </div>
-
 <style>
 .srec{background:var(--surface);border-radius:var(--r16);border:1px solid var(--border);box-shadow:var(--sh1);overflow:hidden;margin-bottom:10px;}
 .srec-head{background:linear-gradient(135deg,var(--p900),var(--p700));padding:12px 14px;display:flex;justify-content:space-between;align-items:center;}
+[data-theme="dark"] .srec-head{background:linear-gradient(135deg,#060C1A,#0D1526);}
 .srec-plate{font-size:15px;font-weight:700;color:#fff;letter-spacing:.02em;}
 .srec-date{font-size:12px;color:rgba(255,255,255,.6);}
 .srec-body{padding:12px 14px;}
@@ -60,113 +55,58 @@
 .srec-note{font-size:11px;color:var(--t3);margin-top:4px;font-style:italic;}
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:var(--r99);border:1px solid var(--border);color:var(--t3);background:var(--bg);}
 </style>
-
 <script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
-var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
-var MLab={INITIAL_1000KM:'ตรวจเช็กระยะ 1,000 กม.แรก',ROUTINE_10K:'ตรวจเช็กตามระยะ 10,000 กม./6 เดือน',TIRE_ROTATION:'สลับยาง',TIRE_REPLACEMENT:'เปลี่ยนยาง',BATTERY_REPLACEMENT:'เปลี่ยนแบตเตอรี่'};
+var MS=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+function tDate(s){if(!s)return"—";try{var d=new Date(s);return d.getDate()+" "+MS[d.getMonth()]+" "+(d.getFullYear()+543);}catch(e){return s;}}
+var MLab={INITIAL_1000KM:"ตรวจเช็กระยะ 1,000 กม.แรก",ROUTINE_10K:"ตรวจเช็กตามระยะ 10,000 กม./6 เดือน",TIRE_ROTATION:"สลับยาง",TIRE_REPLACEMENT:"เปลี่ยนยาง",BATTERY_REPLACEMENT:"เปลี่ยนแบตเตอรี่"};
 var allVehicles=[];
-
-document.addEventListener('DOMContentLoaded',function(){
+document.addEventListener("DOMContentLoaded",function(){
   requireAuth();
   var u=Auth.getUser();
-  if(u){
-    var i=u.name?u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'AD';
-    document.getElementById('sb-av').textContent=i;
-    document.getElementById('sb-nm').textContent=u.name;
-    document.getElementById('sb-rl').textContent=roleLabel(u.role);
-  }
-  // โหลด centers
-  API.call('getCenters').then(function(r){
-    if(!r.success)return;
-    var s=document.getElementById('cf');
-    r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});
-  });
-  // โหลด vehicles สำหรับ dropdown
-  API.call('getVehicles').then(function(r){
-    if(!r.success)return;
-    allVehicles=r.data||[];
-    var sel=document.getElementById('vf');
-    allVehicles.forEach(function(v){
-      var o=document.createElement('option');
-      o.value=v.id;
-      o.textContent=v.plate_number+' ('+v.center_name+')';
-      sel.appendChild(o);
-    });
+  if(u){var i=u.name?u.name.split(" ").map(function(w){return w[0];}).join("").substring(0,2):"AD";document.getElementById("sb-av").textContent=i;document.getElementById("sb-nm").textContent=u.name;document.getElementById("sb-rl").textContent=roleLabel(u.role);}
+  API.call("getCenters").then(function(r){if(!r.success)return;var s=document.getElementById("cf");r.data.forEach(function(c){var o=document.createElement("option");o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
+  API.call("getVehicles").then(function(r){
+    if(!r.success)return;allVehicles=r.data||[];
+    var sel=document.getElementById("vf");
+    allVehicles.forEach(function(v){var o=document.createElement("option");o.value=v.id;o.textContent=v.plate_number+" ("+v.center_name+")";sel.appendChild(o);});
   });
   loadRecs();
 });
-
 function loadRecs(){
-  var vid=document.getElementById('vf').value;
-  document.getElementById('rl').innerHTML='<div class="loading">⏳ กำลังโหลด...</div>';
-  document.getElementById('sum-strip').innerHTML='';
-
-  var params=vid!=='ALL'?{vehicleId:vid}:{};
-  API.call('getServiceRecords',params).then(function(r){
-    if(!r.success){renderRecs([]);return;}
-    renderRecs(r.data||[]);
+  var vid=document.getElementById("vf").value;
+  document.getElementById("rl").innerHTML="<div class='loading'>⏳ กำลังโหลด...</div>";
+  document.getElementById("sum-strip").innerHTML="";
+  API.call("getServiceRecords",vid!=="ALL"?{vehicleId:vid}:{}).then(function(r){
+    renderRecs(r.success?r.data||[]:[]);
   }).catch(function(){renderRecs([]);});
 }
-
 function renderRecs(list){
-  var el=document.getElementById('rl');
-  if(!list.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>ยังไม่มีประวัติการเข้ารับบริการ<br><small style="color:var(--t4)">ประวัติจะแสดงหลังจากบันทึกการซ่อม</small></div>';
-    return;
-  }
-
-  // summary
-  var total=list.length;
-  var types={};
-  list.forEach(function(r){var t=MLab[r.maintenance_type]||r.maintenance_type||'อื่นๆ';types[t]=(types[t]||0)+1;});
-  var strip=document.getElementById('sum-strip');
-  strip.innerHTML='<div class="chip">📋 ทั้งหมด '+total+' รายการ</div>'
-    +Object.keys(types).map(function(t){return'<div class="chip">'+t.split(' ')[0]+' '+types[t]+'</div>';}).join('');
-
-  // group by vehicle
+  var el=document.getElementById("rl");
+  if(!list.length){el.innerHTML="<div class='empty'><div class='empty-icon'>📋</div>ยังไม่มีประวัติการเข้ารับบริการ</div>";return;}
+  var total=list.length,types={};
+  list.forEach(function(r){var t=MLab[r.maintenance_type]||r.maintenance_type||"อื่นๆ";types[t]=(types[t]||0)+1;});
+  document.getElementById("sum-strip").innerHTML="<div class='chip'>📋 ทั้งหมด "+total+" รายการ</div>"
+    +Object.keys(types).map(function(t){return"<div class='chip'>"+t.split(" ")[0]+" "+types[t]+"</div>";}).join("");
   var groups={};
-  list.forEach(function(r){
-    var key=r.vehicle_id||'unknown';
-    if(!groups[key])groups[key]={records:[],plate:'',center:''};
-    groups[key].records.push(r);
-  });
-
-  // หา plate number จาก allVehicles
-  Object.keys(groups).forEach(function(vid){
-    var v=allVehicles.find(function(x){return x.id===vid;});
-    if(v){groups[vid].plate=v.plate_number;groups[vid].center=v.center_name||'';}
-    else{groups[vid].plate=vid;groups[vid].center='';}
-  });
-
+  list.forEach(function(r){var key=r.vehicle_id||"unknown";if(!groups[key])groups[key]={records:[],plate:"",center:""};groups[key].records.push(r);});
+  Object.keys(groups).forEach(function(vid){var v=allVehicles.find(function(x){return x.id===vid;});if(v){groups[vid].plate=v.plate_number;groups[vid].center=v.center_name||"";}else{groups[vid].plate=vid;groups[vid].center="";}});
   el.innerHTML=Object.keys(groups).map(function(vid){
     var g=groups[vid];
-    return g.records.map(function(r,i){
-      var borderColor=i===0?'var(--p600)':'var(--border)';
-      return '<div class="srec">'
-        +'<div class="srec-head">'
-        +'<div><div class="srec-plate">'+g.plate+'</div>'
-        +'<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:1px">'+g.center+'</div></div>'
-        +'<div class="srec-date">'+tDate(r.serviced_at)+'</div>'
-        +'</div>'
-        +'<div class="srec-body">'
-        +'<div class="srec-type">'+(MLab[r.maintenance_type]||r.maintenance_type||'ไม่ระบุประเภท')+'</div>'
-        +'<div class="srec-row">🛣️ เลขไมล์ '+Number(r.mileage_at_service||0).toLocaleString()+' กม.</div>'
-        +(r.tasks?'<div class="srec-tasks">'+r.tasks+'</div>':'')
-        +(r.notes?'<div class="srec-note">หมายเหตุ: '+r.notes+'</div>':'')
-        +'</div></div>';
-    }).join('');
-  }).join('');
+    return g.records.map(function(r){
+      return "<div class='srec'>"
+        +"<div class='srec-head'><div><div class='srec-plate'>"+g.plate+"</div><div style='font-size:11px;color:rgba(255,255,255,.5);margin-top:1px'>"+g.center+"</div></div><div class='srec-date'>"+tDate(r.serviced_at)+"</div></div>"
+        +"<div class='srec-body'>"
+        +"<div class='srec-type'>"+(MLab[r.maintenance_type]||r.maintenance_type||"ไม่ระบุประเภท")+"</div>"
+        +"<div class='srec-row'>🛣️ เลขไมล์ "+Number(r.mileage_at_service||0).toLocaleString()+" กม.</div>"
+        +(r.tasks?"<div class='srec-tasks'>"+r.tasks+"</div>":"")
+        +(r.notes?"<div class='srec-note'>หมายเหตุ: "+r.notes+"</div>":"")
+        +"</div></div>";
+    }).join("");
+  }).join("");
 }
-
-function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
-function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
+function openSB(){document.getElementById("sb").classList.add("open");document.getElementById("ov").classList.add("show");}
+function closeSB(){document.getElementById("sb").classList.remove("open");document.getElementById("ov").classList.remove("show");}
 </script>
 </body>
 </html>
-<!-- ใน <head> — ใส่ก่อน style.css เพื่อป้องกัน flash -->
-<script src="theme.js"></script>
-
-<!-- ใน topbar — เพิ่ม toggle button ข้างๆ topbar-icon -->
-<button class="theme-toggle" onclick="Theme.toggle()">🌙</button>

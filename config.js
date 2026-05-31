@@ -1,2 +1,2 @@
 // config.js — GAS Web App URL (updated)
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbyNLEGeNAH84sQ3Pv0kZa9ebsaTaSoKlF1oj65Xs3-nIdPJ8_LTxJpwotQAAKfJZor_/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwcIgP372M5g9AmR8LRMg0HvnzSGNOCMKe4ejnAVvU7qVSyPHo5Yhu1R5zCgU_0FZE/exec';

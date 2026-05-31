@@ -293,15 +293,41 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 
-/* ══ โหลดรายการรถ ══ */
+/* ══ โหลดรายการรถ — ใช้ getDashboard (เร็วกว่า getVehicles) ══ */
 function loadVehicles(){
   var centerId = document.getElementById('rc').value;
-  document.getElementById('vsel-wrap').innerHTML = '<div class="rpt-empty"><div class="rpt-empty-icon">⏳</div>กำลังโหลด...</div>';
+  document.getElementById('vsel-wrap').innerHTML =
+    '<div class="rpt-empty"><div class="rpt-empty-icon">⏳</div>กำลังโหลด...</div>';
   document.getElementById('rpt-area').style.display = 'none';
 
-  API.call('getVehicles', {centerId: centerId === 'ALL' ? null : centerId}).then(function(r){
+  // timeout 15 วินาที
+  var timedOut = false;
+  var timer = setTimeout(function(){
+    timedOut = true;
+    document.getElementById('vsel-wrap').innerHTML =
+      '<div class="rpt-empty"><div class="rpt-empty-icon">⚠️</div>'
+      +'โหลดนานเกินไป — <button class="btn btn-secondary btn-sm" onclick="loadVehicles()" style="margin-top:8px">ลองใหม่</button></div>';
+  }, 15000);
+
+  // ใช้ getVehicles แต่ไม่ส่ง centerId ถ้าเป็น ALL เพื่อลด payload
+  var params = centerId !== 'ALL' ? {centerId: centerId} : {};
+  API.call('getVehicles', params).then(function(r){
+    if(timedOut) return;
+    clearTimeout(timer);
     allVehicles = r.success ? r.data || [] : [];
+    if(!r.success || !allVehicles.length){
+      document.getElementById('vsel-wrap').innerHTML =
+        '<div class="rpt-empty"><div class="rpt-empty-icon">🚗</div>'
+        +'ไม่พบข้อมูลรถ<br><button class="btn btn-secondary btn-sm" onclick="loadVehicles()" style="margin-top:8px">ลองใหม่</button></div>';
+      return;
+    }
     renderVselGrid(allVehicles);
+  }).catch(function(err){
+    if(timedOut) return;
+    clearTimeout(timer);
+    document.getElementById('vsel-wrap').innerHTML =
+      '<div class="rpt-empty"><div class="rpt-empty-icon">❌</div>'
+      +'เกิดข้อผิดพลาด — <button class="btn btn-secondary btn-sm" onclick="loadVehicles()" style="margin-top:8px">ลองใหม่</button></div>';
   });
 }
 
@@ -338,15 +364,27 @@ function renderVselGrid(vehicles){
 
 /* ══ เลือกรถ ══ */
 function selectVehicle(idx){
-  // อัปเดต active state
   document.querySelectorAll('.vsel-card').forEach(function(c){ c.classList.remove('active'); });
   document.getElementById('vs-'+idx).classList.add('active');
 
   var v = allVehicles[idx];
   curVehicle = v;
 
-  // โหลด service records + audit พร้อมกัน
-  document.getElementById('rpt-area').style.display = 'none';
+  // แสดง loading ก่อน
+  document.getElementById('rpt-area').style.display = 'block';
+  document.getElementById('rpt-plate').textContent  = v.plate_number;
+  document.getElementById('rpt-model').textContent  = (v.brand||'')+' '+(v.model||'');
+  document.getElementById('rpt-center').textContent = v.center_name||'';
+  document.getElementById('rpt-km-badge').innerHTML = '';
+  document.getElementById('rpt-pct').textContent    = '...';
+  document.getElementById('tl-hist').innerHTML = '<div class="loading">⏳ กำลังโหลด...</div>';
+  document.getElementById('plan-list').innerHTML = '';
+  document.getElementById('sum-list').innerHTML  = '';
+  // reset donut
+  document.getElementById('rpt-donut-arc').setAttribute('stroke-dasharray','0 150.8');
+  document.getElementById('rpt-area').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // โหลด service records + audit parallel
   Promise.all([
     API.call('getVehicle', {id: v.id}),
     API.call('getAuditReport', {centerId: v.center_id})
@@ -355,6 +393,10 @@ function selectVehicle(idx){
     var auditData = results[1].success ? results[1].data || [] : [];
     curAudit = auditData.find(function(a){ return a.vehicleId === v.id; }) || null;
     renderReport(vDetail, curAudit);
+  }).catch(function(){
+    var retryBtn = '<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="selectVehicle(' + idx + ')">ลองใหม่</button>';
+    document.getElementById('tl-hist').innerHTML =
+      '<div class="rpt-empty"><div class="rpt-empty-icon">❌</div>เกิดข้อผิดพลาด<br>' + retryBtn + '</div>';
   });
 }
 
@@ -424,7 +466,7 @@ function renderHistTab(records, auditItems){
         var delay = [];
         if(auditItem.delayDays>0) delay.push('ล่าช้า '+auditItem.delayDays+' วัน');
         if(auditItem.delayKm>0)   delay.push(auditItem.delayKm.toLocaleString()+' กม.');
-        badgeHtml = '<span class="tl-badge tl-badge-late">❌ ล่าช้า'+(delay.length?' ('+delay.join('/')+')'):'')+'</span>';
+        badgeHtml = '<span class="tl-badge tl-badge-late">❌ ล่าช้า'+(delay.length?' ('+delay.join('/')+')':'')+'</span>';
       }
     } else {
       badgeHtml = '<span class="tl-badge tl-badge-done">เสร็จสิ้น</span>';

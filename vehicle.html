@@ -488,6 +488,7 @@ function deleteRecord(recordId){
 }
 
 function saveModalRecord(){
+  var recordId  = document.getElementById('modal-record-id').value;
   var type      = document.getElementById('modal-type').value;
   var date      = document.getElementById('modal-date').value;
   var km        = parseInt(document.getElementById('modal-km').value) || 0;

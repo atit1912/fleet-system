@@ -68,8 +68,62 @@
     <div id="tab-hist" style="display:none">
       <div id="mile-chart"></div>
       <div class="icard">
-        <div class="icard-hdr">📋 ประวัติการเข้ารับบริการ</div>
+        <div class="icard-hdr" style="display:flex;align-items:center;justify-content:space-between">
+          <span>📋 ประวัติการเข้ารับบริการ</span>
+          <button class="btn btn-primary btn-sm write-only" onclick="openAddRecord()" style="font-size:12px">➕ เพิ่มประวัติ</button>
+        </div>
         <div style="padding:16px"><div id="tl-wrap" class="timeline"></div></div>
+      </div>
+    </div>
+
+    <!-- Modal: เพิ่ม/แก้ไข service record -->
+    <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center;padding:16px">
+      <div style="background:var(--surface);border-radius:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.4)">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:16px;font-weight:700;color:var(--t1)" id="modal-title">➕ เพิ่มประวัติการเข้ารับบริการ</div>
+          <button onclick="closeModal()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;line-height:1">×</button>
+        </div>
+        <div style="padding:16px 20px">
+          <input type="hidden" id="modal-record-id">
+
+          <div class="fgroup">
+            <label class="flabel">ประเภทการบำรุงรักษา</label>
+            <select id="modal-type" class="fselect" onchange="updateModalTasks()">
+              <option value="INITIAL_1000KM">ตรวจเช็กระยะ 1,000 กม.แรก</option>
+              <option value="ROUTINE_10K">ตรวจเช็กตามระยะ (10,000/6 เดือน)</option>
+              <option value="TIRE_ROTATION">สลับยาง</option>
+              <option value="TIRE_REPLACEMENT">เปลี่ยนยาง</option>
+              <option value="BATTERY_REPLACEMENT">เปลี่ยนแบตเตอรี่</option>
+            </select>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="fgroup">
+              <label class="flabel">วันที่เข้ารับบริการ</label>
+              <input type="date" id="modal-date" class="finput">
+            </div>
+            <div class="fgroup">
+              <label class="flabel">เลขไมล์ตอนเข้า (กม.)</label>
+              <input type="number" id="modal-km" class="finput" placeholder="เช่น 10250">
+            </div>
+          </div>
+
+          <div class="fgroup">
+            <label class="flabel">รายการที่ทำ</label>
+            <div id="modal-checklist" style="background:var(--bg);border-radius:8px;padding:6px 12px;margin-bottom:8px;border:1px solid var(--border)"></div>
+            <input type="text" id="modal-tasks-extra" class="finput" placeholder="พิมพ์เพิ่มเติม (ไม่บังคับ)">
+          </div>
+
+          <div class="fgroup">
+            <label class="flabel">หมายเหตุ</label>
+            <input type="text" id="modal-notes" class="finput" placeholder="ไม่บังคับ">
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-primary btn-full" onclick="saveModalRecord()">💾 บันทึก</button>
+            <button class="btn btn-secondary" onclick="closeModal()" style="flex-shrink:0">ยกเลิก</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -174,9 +228,17 @@ function renderTimeline(records, vehicle){
     var color=ML_COLOR[type]||'var(--p600)';
     var bg=ML_BG[type]||'var(--p100)';
     var title=ML[type]||r.maintenance_type||'ไม่ระบุ';
+    var dateStr = r.serviced_at ? r.serviced_at.split('T')[0] : '';
+    var tasksEsc = String(r.tasks||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var notesEsc = String(r.notes||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var canWrite = typeof Auth!=='undefined' && Auth.canWrite ? Auth.canWrite() : true;
     return '<div class="tl-item">'
       +'<div class="tl-left"><div class="tl-dot" style="background:'+bg+';color:'+color+'">'+icon+'</div><div class="tl-line"></div></div>'
-      +'<div class="tl-content"><div class="tl-date">'+tDate(r.serviced_at)+'</div>'
+      +'<div class="tl-content">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">'
+      +'<div class="tl-date">'+tDate(r.serviced_at)+'</div>'
+      +(canWrite?'<button onclick="openEditRecord(\''+r.id+'\',\''+type+'\',\''+dateStr+'\','+Number(r.mileage_at_service||0)+',\''+tasksEsc+'\',\''+notesEsc+'\')" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--t3);font-size:10px;padding:2px 7px;cursor:pointer;flex-shrink:0">✏️ แก้</button>':'')
+      +'</div>'
       +'<div class="tl-title">'+title+'</div>'
       +'<div class="tl-meta">🛣️ '+Number(r.mileage_at_service||0).toLocaleString()+' กม.</div>'
       +(r.tasks?'<div class="tl-tasks">'+r.tasks+'</div>':'')
@@ -357,6 +419,108 @@ function showT(id,el){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
   el.classList.add('active');
 }
+
+/* ══ Modal: เพิ่ม/แก้ไข service record ══ */
+var MODAL_TASKS = {
+  INITIAL_1000KM:      ['ตรวจเช็กระยะ 1,000 กม.แรก','เปลี่ยนน้ำมันเครื่อง','ตรวจสอบระดับน้ำมันเบรก','ตรวจสอบยางรถยนต์','ตรวจสอบแบตเตอรี่'],
+  ROUTINE_10K:         ['ตรวจเช็กตามระยะ 10,000 กม.','เปลี่ยนน้ำมันเครื่อง','เปลี่ยนไส้กรองน้ำมันเครื่อง','ตรวจเช็ก 20 รายการ','ตรวจสอบระบบเบรก','ตรวจสอบระบบไฟ'],
+  TIRE_ROTATION:       ['สลับยาง 4 เส้น','ตรวจสอบแรงดันลมยาง','ตรวจสอบดอกยาง','ตรวจสอบน็อตล้อ'],
+  TIRE_REPLACEMENT:    ['เปลี่ยนยาง 4 เส้น','ตรวจสอบแรงดันลมยาง','ตั้งศูนย์ล้อ','ถ่วงล้อ'],
+  BATTERY_REPLACEMENT: ['เปลี่ยนแบตเตอรี่','ตรวจสอบขั้วแบตเตอรี่','ทดสอบกระแสไฟ']
+};
+
+function openAddRecord(){
+  document.getElementById('modal-record-id').value = '';
+  document.getElementById('modal-title').textContent = '➕ เพิ่มประวัติการเข้ารับบริการ';
+  document.getElementById('modal-type').value = 'ROUTINE_10K';
+  document.getElementById('modal-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-km').value = VD ? VD.current_mileage : '';
+  document.getElementById('modal-tasks-extra').value = '';
+  document.getElementById('modal-notes').value = '';
+  updateModalTasks();
+  var ov = document.getElementById('modal-overlay');
+  ov.style.display = 'flex';
+}
+
+function openEditRecord(recordId, type, date, km, tasks, notes){
+  document.getElementById('modal-record-id').value = recordId;
+  document.getElementById('modal-title').textContent = '✏️ แก้ไขประวัติการเข้ารับบริการ';
+  document.getElementById('modal-type').value = type;
+  document.getElementById('modal-date').value = date;
+  document.getElementById('modal-km').value = km;
+  document.getElementById('modal-tasks-extra').value = tasks || '';
+  document.getElementById('modal-notes').value = notes || '';
+  updateModalTasks(tasks);
+  var ov = document.getElementById('modal-overlay');
+  ov.style.display = 'flex';
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+function updateModalTasks(existingTasks){
+  var type = document.getElementById('modal-type').value;
+  var presets = MODAL_TASKS[type] || [];
+  var existing = existingTasks ? existingTasks.split(',').map(function(t){return t.trim();}) : [];
+  var html = presets.map(function(task, i){
+    var checked = existing.length ? existing.indexOf(task) > -1 : i === 0;
+    return '<label style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-light);cursor:pointer;font-size:13px;color:var(--t1)">'
+      +'<input type="checkbox" value="'+task+'"'+(checked?' checked':'')+' style="width:16px;height:16px;cursor:pointer;accent-color:var(--p600)">'
+      +task+'</label>';
+  }).join('');
+  document.getElementById('modal-checklist').innerHTML = html;
+}
+
+function saveModalRecord(){
+  var recordId  = document.getElementById('modal-record-id').value;
+  var type      = document.getElementById('modal-type').value;
+  var date      = document.getElementById('modal-date').value;
+  var km        = parseInt(document.getElementById('modal-km').value) || 0;
+  var extra     = document.getElementById('modal-tasks-extra').value.trim();
+  var notes     = document.getElementById('modal-notes').value.trim();
+
+  if(!date){ alert('กรุณาเลือกวันที่'); return; }
+  if(!km){ alert('กรุณากรอกเลขไมล์'); return; }
+
+  // รวม checklist
+  var checked = [];
+  document.querySelectorAll('#modal-checklist input[type=checkbox]').forEach(function(chk){
+    if(chk.checked) checked.push(chk.value);
+  });
+  var tasks = checked.concat(extra ? [extra] : []).join(', ');
+
+  if(recordId){
+    // แก้ไข record เดิม
+    API.post('updateServiceRecord',{
+      recordId: recordId, vehicleId: VID,
+      maintenanceType: type, servicedAt: date,
+      mileageAtService: km, tasks: tasks, notes: notes
+    }).then(function(r){
+      if(r.success){
+        localStorage.setItem('fleet-data-updated', Date.now());
+        closeModal(); loadV();
+      } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+    });
+  } else {
+    // เพิ่ม record ใหม่
+    API.post('addServiceRecord',{
+      vehicleId: VID, maintenanceType: type,
+      servicedAt: date, mileageAtService: km,
+      tasks: tasks, notes: notes, appointmentClosed: 'false'
+    }).then(function(r){
+      if(r.success){
+        localStorage.setItem('fleet-data-updated', Date.now());
+        closeModal(); loadV();
+      } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+    });
+  }
+}
+
+// ปิด modal เมื่อกด overlay
+document.getElementById('modal-overlay').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+});
 </script>
 </body>
 </html>

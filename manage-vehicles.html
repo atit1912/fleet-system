@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Intelligent Fleet SHE&amp;En — จัดการรถยนต์</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── fab button ── */
+.fab{position:fixed;bottom:80px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--p600);color:#fff;border:none;font-size:24px;box-shadow:0 4px 16px rgba(11,94,215,.4);cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s;}
+.fab:active{transform:scale(.92);box-shadow:0 2px 8px rgba(11,94,215,.3);}
+
+/* ── modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center;padding:0;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 32px rgba(0,0,0,.3);animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(60px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.modal-head{padding:12px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:700;color:var(--t1);}
+.modal-close{background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;}
+.modal-body{padding:16px 20px 32px;}
+
+/* ── section title ── */
+.sec-title{font-size:11px;font-weight:700;color:var(--t4);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 8px;}
+.sec-title:first-child{margin-top:0;}
+
+/* ── form grid ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-grid .full{grid-column:1/-1;}
+
+/* ── vehicle card ── */
+.vcard-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.vcard-actions{display:flex;gap:6px;margin-top:10px;}
+.vcard-actions .btn{flex:1;font-size:12px;padding:6px 0;}
+.inactive-badge{opacity:.5;}
+
+/* ── filter bar ── */
+.filter-bar{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-chip{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.filter-chip.active{background:var(--p600);border-color:var(--p600);color:#fff;}
+
+/* ── confirm dialog ── */
+.confirm-dialog{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:none;align-items:center;justify-content:center;padding:24px;}
+.confirm-dialog.open{display:flex;}
+.confirm-box{background:var(--surface);border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.confirm-icon{font-size:40px;margin-bottom:12px;}
+.confirm-title{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px;}
+.confirm-msg{font-size:13px;color:var(--t3);margin-bottom:20px;line-height:1.5;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-btns .btn{flex:1;}
+
+/* ── empty state ── */
+.vlist-empty{text-align:center;padding:60px 20px;color:var(--t4);}
+.vlist-empty-icon{font-size:48px;margin-bottom:12px;}
+.vlist-empty-msg{font-size:14px;}
+
+/* ── status indicator ── */
+.vcard-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-active{background:var(--success);}
+.dot-inactive{background:var(--t4);}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="overlay" id="ov" onclick="closeSB()"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sb">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">🚗</div>
+      <div><div class="sb-logo-name">Intelligent Fleet</div><div class="sb-logo-sub">SHE&amp;En Management</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-av">—</div>
+      <div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div>
+    </div>
+  </div>
+  <div class="sb-section">เมนูหลัก</div>
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
+  <a href="vehicles.html" class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
+  <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
+  <div class="sb-section">จัดการข้อมูล</div>
+  <a href="manage-vehicles.html" class="nav-item active"><span class="nav-icon">🚙</span>จัดการรถยนต์</a>
+  <a href="manage-drivers.html" class="nav-item"><span class="nav-icon">👤</span>จัดการผู้ขับขี่</a>
+  <div class="sb-section">ข้อมูล</div>
+  <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
+  <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติการเข้ารับบริการ</a>
+  <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
+  <div class="sb-spacer"></div>
+  <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
+</nav>
+
+<!-- Main -->
+<main class="main">
+  <header class="topbar">
+    <button class="menu-btn" onclick="openSB()">☰</button>
+    <div class="topbar-center"><div class="topbar-title">จัดการรถยนต์</div></div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="Theme.toggle()">🌙</button>
+      <select class="center-sel" id="cf" onchange="loadVehicles()">
+        <option value="ALL">ทุกศูนย์</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- filter chips -->
+  <div class="filter-bar">
+    <div class="filter-chip active" onclick="setFilter('ALL',this)">ทั้งหมด</div>
+    <div class="filter-chip" onclick="setFilter('ACTIVE',this)">ใช้งานอยู่</div>
+    <div class="filter-chip" onclick="setFilter('INACTIVE',this)">ไม่ใช้งาน</div>
+  </div>
+
+  <div class="page-body">
+    <div id="vl"><div class="loading">⏳ กำลังโหลด...</div></div>
+  </div>
+</main>
+
+<!-- Bottom nav -->
+<nav class="bottom-nav">
+  <a href="index.html" class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="manage-vehicles.html" class="bnav active"><div class="bnav-wrap">🚙</div><span>จัดการรถ</span></a>
+  <a href="manage-drivers.html" class="bnav"><div class="bnav-wrap">👤</div><span>จัดการคนขับ</span></a>
+  <a href="report.html" class="bnav"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
+</nav>
+
+<!-- FAB -->
+<button class="fab super-only" onclick="openAdd()" title="เพิ่มรถใหม่">＋</button>
+
+</div><!-- #app -->
+
+<!-- ══ Modal: เพิ่ม/แก้ไขรถ ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">🚙 เพิ่มรถใหม่</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fid">
+
+      <!-- ข้อมูลหลัก -->
+      <div class="sec-title">ข้อมูลรถ</div>
+      <div class="form-grid">
+        <div class="fgroup full">
+          <label class="flabel">ทะเบียนรถ <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="fplate" class="finput" placeholder="เช่น กข 1234 กรุงเทพ" autocomplete="off">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">ยี่ห้อ <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="fbrand" class="finput" placeholder="เช่น Toyota">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">รุ่น <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="fmodel" class="finput" placeholder="เช่น Fortuner">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">สี</label>
+          <input type="text" id="fcolor" class="finput" placeholder="เช่น ขาวมุก">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">ประเภท</label>
+          <select id="ftype" class="fselect">
+            <option value="รถยนต์นั่ง">รถยนต์นั่ง</option>
+            <option value="รถกระบะ">รถกระบะ</option>
+            <option value="รถตู้">รถตู้</option>
+            <option value="รถ SUV">รถ SUV</option>
+            <option value="รถ PPV">รถ PPV</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ศูนย์และผู้ครอบครอง -->
+      <div class="sec-title">ศูนย์วิจัยและผู้ครอบครอง</div>
+      <div class="form-grid">
+        <div class="fgroup">
+          <label class="flabel">ศูนย์วิจัย <span style="color:var(--danger)">*</span></label>
+          <select id="fcenter" class="fselect">
+            <option value="">— เลือกศูนย์ —</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">ผู้ครอบครองหลัก</label>
+          <input type="text" id="fdriver" class="finput" placeholder="ชื่อ-นามสกุล">
+        </div>
+      </div>
+
+      <!-- วันที่และไมล์ -->
+      <div class="sec-title">วันที่และเลขไมล์</div>
+      <div class="form-grid">
+        <div class="fgroup">
+          <label class="flabel">วันที่รับรถ</label>
+          <input type="date" id="fdelivered" class="finput">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">หมดสัญญาเช่า</label>
+          <input type="date" id="flease" class="finput">
+        </div>
+        <div class="fgroup full">
+          <label class="flabel">เลขไมล์เริ่มต้น (กม.)</label>
+          <input type="number" id="fmile" class="finput" placeholder="0" min="0">
+        </div>
+      </div>
+
+      <!-- status (เฉพาะแก้ไข) -->
+      <div id="fstatus-group" style="display:none">
+        <div class="sec-title">สถานะ</div>
+        <select id="fstatus" class="fselect">
+          <option value="ACTIVE">ใช้งานอยู่</option>
+          <option value="INACTIVE">ไม่ใช้งาน (ซ่อน)</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-primary btn-full" onclick="saveVehicle()">💾 บันทึก</button>
+        <button class="btn btn-secondary" onclick="closeModal()" style="flex-shrink:0">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Confirm Dialog ══ -->
+<div class="confirm-dialog" id="confirm-dialog">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="cd-icon">⚠️</div>
+    <div class="confirm-title" id="cd-title">ยืนยันการดำเนินการ</div>
+    <div class="confirm-msg" id="cd-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-secondary" onclick="closeConfirm()">ยกเลิก</button>
+      <button class="btn btn-primary" id="cd-ok" style="background:var(--danger);border-color:var(--danger)">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
+<script>
+var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
+
+var allVehicles = [];
+var currentFilter = 'ALL';
+var centersMap = {};
+
+document.addEventListener('DOMContentLoaded', function(){
+  requireAuth();
+  applyPermissions();
+  var u = Auth.getUser();
+  if(u){
+    var ini = u.name ? u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2) : 'AD';
+    document.getElementById('sb-av').textContent = ini;
+    document.getElementById('sb-nm').textContent = u.name;
+    document.getElementById('sb-rl').textContent = roleLabel(u.role);
+  }
+  // โหลดศูนย์วิจัย
+  API.call('getCenters').then(function(r){
+    if(!r.success) return;
+    var sel  = document.getElementById('cf');
+    var fsel = document.getElementById('fcenter');
+    r.data.forEach(function(c){
+      centersMap[c.id] = c.name;
+      var o1 = document.createElement('option'); o1.value = c.id; o1.textContent = c.name; sel.appendChild(o1);
+      var o2 = document.createElement('option'); o2.value = c.id; o2.textContent = c.name; fsel.appendChild(o2);
+    });
+  });
+  loadVehicles();
+});
+
+function loadVehicles(){
+  document.getElementById('vl').innerHTML = '<div class="loading">⏳ กำลังโหลด...</div>';
+  var cid = document.getElementById('cf').value;
+  var params = {};
+  if(cid !== 'ALL') params.centerId = cid;
+  API.call('getVehicles', params).then(function(r){
+    allVehicles = r.success ? (r.data || []) : [];
+    renderList();
+  }).catch(function(){ renderList(); });
+}
+
+function setFilter(f, el){
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('active'); });
+  el.classList.add('active');
+  renderList();
+}
+
+function renderList(){
+  var el  = document.getElementById('vl');
+  var list = allVehicles.filter(function(v){
+    if(currentFilter === 'ALL') return true;
+    return (v.status || 'ACTIVE') === currentFilter;
+  });
+
+  if(!list.length){
+    el.innerHTML = '<div class="vlist-empty"><div class="vlist-empty-icon">🚗</div><div class="vlist-empty-msg">ไม่พบรถยนต์</div></div>';
+    return;
+  }
+
+  var canWrite = Auth.canWrite ? Auth.canWrite() : false;
+  var isSA     = Auth.isSuperAdmin ? Auth.isSuperAdmin() : false;
+
+  el.innerHTML = list.map(function(v, i){
+    var status  = v.status || 'ACTIVE';
+    var isActive = status === 'ACTIVE';
+    var worst   = v.worstStatus || 'NORMAL';
+    var bm = {OVERDUE:'b-red',DUE_SOON:'b-orange',APPOINTED:'b-blue',NORMAL:'b-green'};
+    var lm = {OVERDUE:'เกินกำหนด',DUE_SOON:'ใกล้ครบ',APPOINTED:'นัดแล้ว',NORMAL:'ปกติ'};
+    var cc = worst==='OVERDUE'?'vcard-red':worst==='DUE_SOON'?'vcard-orange':worst==='APPOINTED'?'vcard-blue':'vcard-green';
+    var opClass = isActive ? '' : 'inactive-badge';
+
+    return '<div class="vcard '+cc+' '+opClass+' fu'+(i<6?' fu'+(i+1):'')+'">'
+      +'<div class="vcard-stripe"></div><div class="vcard-body">'
+      +'<div class="vcard-row">'
+      +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">'
+      +'<div class="vcard-status-dot '+(isActive?'dot-active':'dot-inactive')+'"></div>'
+      +'<div style="min-width:0"><div class="vcard-plate">'+v.plate_number+'</div>'
+      +'<div class="vcard-model">'+(v.brand||'')+(v.model?' '+v.model:'')+(v.vehicle_type?' · '+v.vehicle_type:'')+'</div></div>'
+      +'</div>'
+      +(isActive?'<span class="badge '+(bm[worst]||'b-green')+'">'+(lm[worst]||worst)+'</span>':'<span class="badge" style="background:var(--bg);color:var(--t4);border:1px solid var(--border)">ไม่ใช้งาน</span>')
+      +'</div>'
+      +'<div class="vcard-meta">🏢 '+(v.center_name || centersMap[v.center_id] || '—')+' · 👤 '+(v.primary_driver_name||'—')+'</div>'
+      +'<div class="vcard-meta">🛣️ '+Number(v.current_mileage||0).toLocaleString()+' กม. · 📅 หมดสัญญา '+tDate(v.lease_expires_at)+'</div>'
+      +(canWrite ?
+        '<div class="vcard-actions">'
+        +'<button class="btn btn-secondary" onclick="openEdit(\''+v.id+'\')">✏️ แก้ไข</button>'
+        +(isSA ? '<button class="btn" style="background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger)" onclick="confirmToggle(\''+v.id+'\',\''+v.plate_number+'\','+isActive+')">'+(!isActive?'✅ เปิดใช้':'🚫 ปิดใช้')+'</button>' : '')
+        +'</div>'
+       : '')
+      +'</div></div>';
+  }).join('');
+}
+
+/* ── Modal ── */
+function openAdd(){
+  document.getElementById('fid').value = '';
+  document.getElementById('modal-title').textContent = '🚙 เพิ่มรถใหม่';
+  document.getElementById('fplate').value = '';
+  document.getElementById('fbrand').value = '';
+  document.getElementById('fmodel').value = '';
+  document.getElementById('fcolor').value = '';
+  document.getElementById('ftype').value  = 'รถยนต์นั่ง';
+  document.getElementById('fcenter').value = '';
+  document.getElementById('fdriver').value = '';
+  document.getElementById('fdelivered').value = '';
+  document.getElementById('flease').value = '';
+  document.getElementById('fmile').value = '0';
+  document.getElementById('fstatus-group').style.display = 'none';
+  showModal();
+}
+
+function openEdit(id){
+  var v = allVehicles.find(function(x){ return x.id === id; });
+  if(!v) return;
+  document.getElementById('fid').value    = v.id;
+  document.getElementById('modal-title').textContent = '✏️ แก้ไขรถ — '+v.plate_number;
+  document.getElementById('fplate').value    = v.plate_number    || '';
+  document.getElementById('fbrand').value    = v.brand           || '';
+  document.getElementById('fmodel').value    = v.model           || '';
+  document.getElementById('fcolor').value    = v.color           || '';
+  document.getElementById('ftype').value     = v.vehicle_type    || 'รถยนต์นั่ง';
+  document.getElementById('fcenter').value   = v.center_id       || '';
+  document.getElementById('fdriver').value   = v.primary_driver_name || '';
+  document.getElementById('fdelivered').value = v.delivered_at   || '';
+  document.getElementById('flease').value    = v.lease_expires_at || '';
+  document.getElementById('fmile').value     = v.current_mileage  || 0;
+  document.getElementById('fstatus').value   = v.status           || 'ACTIVE';
+  document.getElementById('fstatus-group').style.display = 'block';
+  showModal();
+}
+
+function showModal(){
+  var ov = document.getElementById('modal-overlay');
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e){
+  if(e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function saveVehicle(){
+  var id      = document.getElementById('fid').value;
+  var plate   = document.getElementById('fplate').value.trim();
+  var brand   = document.getElementById('fbrand').value.trim();
+  var model   = document.getElementById('fmodel').value.trim();
+  var centerId = document.getElementById('fcenter').value;
+
+  if(!plate){ alert('กรุณากรอกทะเบียนรถ'); document.getElementById('fplate').focus(); return; }
+  if(!brand){ alert('กรุณากรอกยี่ห้อรถ'); document.getElementById('fbrand').focus(); return; }
+  if(!model){ alert('กรุณากรอกรุ่นรถ'); document.getElementById('fmodel').focus(); return; }
+  if(!centerId){ alert('กรุณาเลือกศูนย์วิจัย'); document.getElementById('fcenter').focus(); return; }
+
+  var payload = {
+    plate_number:         plate,
+    brand:                brand,
+    model:                model,
+    color:                document.getElementById('fcolor').value.trim(),
+    vehicle_type:         document.getElementById('ftype').value,
+    center_id:            centerId,
+    center_name:          centersMap[centerId] || '',
+    primary_driver_name:  document.getElementById('fdriver').value.trim(),
+    delivered_at:         document.getElementById('fdelivered').value,
+    lease_expires_at:     document.getElementById('flease').value,
+    current_mileage:      parseInt(document.getElementById('fmile').value) || 0,
+  };
+
+  if(id){
+    // แก้ไข
+    payload.id     = id;
+    payload.status = document.getElementById('fstatus').value;
+    API.post('updateVehicle', payload).then(function(r){
+      if(r.success){
+        localStorage.setItem('fleet-data-updated', Date.now());
+        closeModal();
+        loadVehicles();
+        showToast('✅ บันทึกสำเร็จ');
+      } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+    });
+  } else {
+    // เพิ่มใหม่
+    API.post('addVehicle', payload).then(function(r){
+      if(r.success){
+        localStorage.setItem('fleet-data-updated', Date.now());
+        closeModal();
+        loadVehicles();
+        showToast('✅ เพิ่มรถใหม่เรียบร้อย');
+      } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+    });
+  }
+}
+
+/* ── Confirm toggle status ── */
+function confirmToggle(id, plate, isActive){
+  var action = isActive ? 'ปิดการใช้งาน' : 'เปิดการใช้งาน';
+  document.getElementById('cd-icon').textContent  = isActive ? '🚫' : '✅';
+  document.getElementById('cd-title').textContent = action+'รถ';
+  document.getElementById('cd-msg').textContent   = 'ต้องการ'+action+' "'+plate+'" ใช่ไหม?';
+  document.getElementById('cd-ok').textContent    = action;
+  document.getElementById('cd-ok').style.background     = isActive ? 'var(--danger)' : 'var(--success)';
+  document.getElementById('cd-ok').style.borderColor    = isActive ? 'var(--danger)' : 'var(--success)';
+  document.getElementById('cd-ok').onclick = function(){
+    closeConfirm();
+    toggleVehicleStatus(id, isActive ? 'INACTIVE' : 'ACTIVE');
+  };
+  document.getElementById('confirm-dialog').classList.add('open');
+}
+
+function closeConfirm(){
+  document.getElementById('confirm-dialog').classList.remove('open');
+}
+
+function toggleVehicleStatus(id, newStatus){
+  var v = allVehicles.find(function(x){ return x.id === id; });
+  if(!v) return;
+  var payload = Object.assign({}, v, { status: newStatus });
+  // ลบ field ที่ไม่ต้องการส่ง
+  delete payload.maintenance;
+  delete payload.worstStatus;
+  delete payload.serviceRecords;
+  delete payload.mileageLogs;
+  API.post('updateVehicle', payload).then(function(r){
+    if(r.success){
+      localStorage.setItem('fleet-data-updated', Date.now());
+      loadVehicles();
+      showToast(newStatus === 'INACTIVE' ? '🚫 ปิดการใช้งานแล้ว' : '✅ เปิดการใช้งานแล้ว');
+    } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+  });
+}
+
+/* ── Toast ── */
+function showToast(msg){
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--surface);padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:fadeIn .2s ease';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){ t.remove(); }, 300); }, 2200);
+}
+
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
+</script>
+</body>
+</html>

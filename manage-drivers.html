@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Intelligent Fleet SHE&amp;En — จัดการผู้ขับขี่</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="style.css">
+<style>
+.fab{position:fixed;bottom:80px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--p600);color:#fff;border:none;font-size:24px;box-shadow:0 4px 16px rgba(11,94,215,.4);cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s;}
+.fab:active{transform:scale(.92);}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 32px rgba(0,0,0,.3);animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(60px);opacity:.5}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.modal-head{padding:12px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:700;color:var(--t1);}
+.modal-close{background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;line-height:1;}
+.modal-body{padding:16px 20px 32px;}
+
+.sec-title{font-size:11px;font-weight:700;color:var(--t4);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 8px;}
+.sec-title:first-child{margin-top:0;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-grid .full{grid-column:1/-1;}
+
+/* avatar circle */
+.drv-avatar{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;background:linear-gradient(135deg,var(--p400),var(--p600));}
+
+/* license badge inline */
+.lic-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.lic-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;}
+.lic-tag.valid{background:var(--success-bg);color:var(--success);}
+.lic-tag.expiring{background:var(--warning-bg);color:var(--warning);}
+.lic-tag.expired{background:var(--danger-bg);color:var(--danger);}
+.lic-tag.none{background:var(--bg);color:var(--t4);border:1px solid var(--border);}
+
+/* vcard-actions reuse */
+.vcard-actions{display:flex;gap:6px;margin-top:10px;}
+.vcard-actions .btn{flex:1;font-size:12px;padding:6px 0;}
+.inactive-badge{opacity:.5;}
+
+.filter-bar{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-chip{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.filter-chip.active{background:var(--p600);border-color:var(--p600);color:#fff;}
+
+.confirm-dialog{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:none;align-items:center;justify-content:center;padding:24px;}
+.confirm-dialog.open{display:flex;}
+.confirm-box{background:var(--surface);border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center;}
+.confirm-icon{font-size:40px;margin-bottom:12px;}
+.confirm-title{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px;}
+.confirm-msg{font-size:13px;color:var(--t3);margin-bottom:20px;line-height:1.5;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-btns .btn{flex:1;}
+
+.vcard-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-active{background:var(--success);}
+.dot-inactive{background:var(--t4);}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="overlay" id="ov" onclick="closeSB()"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sb">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">🚗</div>
+      <div><div class="sb-logo-name">Intelligent Fleet</div><div class="sb-logo-sub">SHE&amp;En Management</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-av">—</div>
+      <div><div class="sb-uname" id="sb-nm">—</div><div class="sb-urole" id="sb-rl">—</div></div>
+    </div>
+  </div>
+  <div class="sb-section">เมนูหลัก</div>
+  <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
+  <a href="vehicles.html" class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
+  <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
+  <div class="sb-section">จัดการข้อมูล</div>
+  <a href="manage-vehicles.html" class="nav-item"><span class="nav-icon">🚙</span>จัดการรถยนต์</a>
+  <a href="manage-drivers.html" class="nav-item active"><span class="nav-icon">👤</span>จัดการผู้ขับขี่</a>
+  <div class="sb-section">ข้อมูล</div>
+  <a href="drivers.html" class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
+  <a href="service.html" class="nav-item"><span class="nav-icon">📋</span>ประวัติการเข้ารับบริการ</a>
+  <a href="report.html" class="nav-item"><span class="nav-icon">📊</span>รายงาน</a>
+  <div class="sb-spacer"></div>
+  <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
+</nav>
+
+<main class="main">
+  <header class="topbar">
+    <button class="menu-btn" onclick="openSB()">☰</button>
+    <div class="topbar-center"><div class="topbar-title">จัดการผู้ขับขี่</div></div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="Theme.toggle()">🌙</button>
+      <select class="center-sel" id="cf" onchange="loadDrivers()">
+        <option value="ALL">ทุกศูนย์</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="filter-chip active" onclick="setFilter('ALL',this)">ทั้งหมด</div>
+    <div class="filter-chip" onclick="setFilter('ACTIVE',this)">ใช้งานอยู่</div>
+    <div class="filter-chip" onclick="setFilter('INACTIVE',this)">ไม่ใช้งาน</div>
+  </div>
+
+  <div class="page-body">
+    <div id="dl"><div class="loading">⏳ กำลังโหลด...</div></div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <a href="index.html" class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
+  <a href="vehicles.html" class="bnav"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
+  <a href="manage-vehicles.html" class="bnav"><div class="bnav-wrap">🚙</div><span>จัดการรถ</span></a>
+  <a href="manage-drivers.html" class="bnav active"><div class="bnav-wrap">👤</div><span>จัดการคนขับ</span></a>
+  <a href="report.html" class="bnav"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
+</nav>
+
+<button class="fab write-only" onclick="openAdd()" title="เพิ่มผู้ขับขี่">＋</button>
+
+</div><!-- #app -->
+
+<!-- ══ Modal: เพิ่ม/แก้ไขผู้ขับขี่ ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">👤 เพิ่มผู้ขับขี่ใหม่</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fid">
+
+      <!-- ข้อมูลส่วนตัว -->
+      <div class="sec-title">ข้อมูลส่วนตัว</div>
+      <div class="form-grid">
+        <div class="fgroup full">
+          <label class="flabel">ชื่อ-นามสกุล <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="fname" class="finput" placeholder="เช่น สมชาย ใจดี" autocomplete="off">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">แผนก/ตำแหน่ง</label>
+          <input type="text" id="fdept" class="finput" placeholder="เช่น แผนกวิจัย">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">เบอร์โทร</label>
+          <input type="tel" id="fphone" class="finput" placeholder="0812345678">
+        </div>
+        <div class="fgroup full">
+          <label class="flabel">อีเมล</label>
+          <input type="email" id="femail" class="finput" placeholder="example@company.com">
+        </div>
+      </div>
+
+      <!-- ศูนย์ -->
+      <div class="sec-title">ศูนย์วิจัย</div>
+      <div class="fgroup">
+        <label class="flabel">สังกัดศูนย์ <span style="color:var(--danger)">*</span></label>
+        <select id="fcenter" class="fselect">
+          <option value="">— เลือกศูนย์ —</option>
+        </select>
+      </div>
+
+      <!-- ใบอนุญาตขับขี่ -->
+      <div class="sec-title">ใบอนุญาตขับขี่ (ถ้ามี)</div>
+      <div id="lic-list"></div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="addLicRow()" style="margin-top:6px;font-size:12px">➕ เพิ่มใบขับขี่</button>
+
+      <!-- status (แก้ไขเท่านั้น) -->
+      <div id="fstatus-group" style="display:none">
+        <div class="sec-title">สถานะ</div>
+        <select id="fstatus" class="fselect">
+          <option value="ACTIVE">ใช้งานอยู่</option>
+          <option value="INACTIVE">ไม่ใช้งาน</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-primary btn-full" onclick="saveDriver()">💾 บันทึก</button>
+        <button class="btn btn-secondary" onclick="closeModal()" style="flex-shrink:0">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Confirm ══ -->
+<div class="confirm-dialog" id="confirm-dialog">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="cd-icon">⚠️</div>
+    <div class="confirm-title" id="cd-title">ยืนยัน</div>
+    <div class="confirm-msg" id="cd-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-secondary" onclick="closeConfirm()">ยกเลิก</button>
+      <button class="btn btn-primary" id="cd-ok">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
+<script>
+var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
+
+var allDrivers = [];
+var currentFilter = 'ALL';
+var centersMap = {};
+var licRowCount = 0;
+
+document.addEventListener('DOMContentLoaded', function(){
+  requireAuth();
+  applyPermissions();
+  var u = Auth.getUser();
+  if(u){
+    var ini = u.name ? u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2) : 'AD';
+    document.getElementById('sb-av').textContent = ini;
+    document.getElementById('sb-nm').textContent = u.name;
+    document.getElementById('sb-rl').textContent = roleLabel(u.role);
+  }
+  API.call('getCenters').then(function(r){
+    if(!r.success) return;
+    var sel  = document.getElementById('cf');
+    var fsel = document.getElementById('fcenter');
+    r.data.forEach(function(c){
+      centersMap[c.id] = c.name;
+      var o1 = document.createElement('option'); o1.value = c.id; o1.textContent = c.name; sel.appendChild(o1);
+      var o2 = document.createElement('option'); o2.value = c.id; o2.textContent = c.name; fsel.appendChild(o2);
+    });
+  });
+  loadDrivers();
+});
+
+function loadDrivers(){
+  document.getElementById('dl').innerHTML = '<div class="loading">⏳ กำลังโหลด...</div>';
+  var cid = document.getElementById('cf').value;
+  var params = {};
+  if(cid !== 'ALL') params.centerId = cid;
+  API.call('getDrivers', params).then(function(r){
+    allDrivers = r.success ? (r.data || []) : [];
+    renderList();
+  }).catch(function(){ renderList(); });
+}
+
+function setFilter(f, el){
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('active'); });
+  el.classList.add('active');
+  renderList();
+}
+
+function renderList(){
+  var el = document.getElementById('dl');
+  var list = allDrivers.filter(function(d){
+    if(currentFilter === 'ALL') return true;
+    return (d.status || 'ACTIVE') === currentFilter;
+  });
+
+  if(!list.length){
+    el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div>ไม่พบข้อมูลผู้ขับขี่</div>';
+    return;
+  }
+
+  var canWrite = Auth.canWrite ? Auth.canWrite() : false;
+  var isSA     = Auth.isSuperAdmin ? Auth.isSuperAdmin() : false;
+
+  el.innerHTML = list.map(function(d, i){
+    var status   = d.status || 'ACTIVE';
+    var isActive = status === 'ACTIVE';
+    var ls       = d.licenseStatus || 'NO_LICENSE';
+    var lsBadge  = ls==='EXPIRED'
+      ? "<span class='badge b-red'>ใบขับขี่หมดอายุ</span>"
+      : ls==='EXPIRING_SOON'
+        ? "<span class='badge b-orange'>ใบขับขี่ใกล้หมด</span>"
+        : ls==='VALID'
+          ? "<span class='badge b-green'>ใบขับขี่ปกติ</span>"
+          : "<span class='badge' style='background:var(--bg);color:var(--t4);border:1px solid var(--border)'>ไม่มีใบขับขี่</span>";
+    var cc = ls==='EXPIRED'?'vcard-red':ls==='EXPIRING_SOON'?'vcard-orange':'vcard-green';
+    var ini = d.name ? d.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2) : '??';
+    var opClass = isActive ? '' : 'inactive-badge';
+
+    // license tags
+    var licTags = '';
+    if(d.licenses && d.licenses.length){
+      licTags = '<div class="lic-row">'
+        + d.licenses.map(function(l){
+          var now=new Date(), exp=new Date(l.expires_at), warn=new Date(); warn.setDate(warn.getDate()+30);
+          var cls = exp<now?'expired':exp<warn?'expiring':'valid';
+          var icon = cls==='expired'?'❌':cls==='expiring'?'⚠️':'✅';
+          return '<span class="lic-tag '+cls+'">'+icon+' '+(l.license_type||l.type||'ขับขี่')+'<span style="opacity:.7;font-weight:400"> หมด '+tDate(l.expires_at)+'</span></span>';
+        }).join('')
+        + '</div>';
+    }
+
+    return '<div class="vcard '+cc+' '+opClass+' fu'+(i<6?' fu'+(i+1):'')+'">'
+      +'<div class="vcard-stripe"></div><div class="vcard-body">'
+      +'<div class="vcard-row">'
+      +'<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">'
+      +'<div class="vcard-status-dot '+(isActive?'dot-active':'dot-inactive')+'"></div>'
+      +'<div class="drv-avatar">'+ini+'</div>'
+      +'<div style="min-width:0"><div class="vcard-plate">'+d.name+'</div>'
+      +'<div class="vcard-model">'+(d.department||'—')+' · '+(d.center_name||centersMap[d.center_id]||'')+'</div></div>'
+      +'</div>'+lsBadge
+      +'</div>'
+      +(d.phone?'<div class="vcard-meta" style="margin-top:6px">📞 '+d.phone+(d.email?' · ✉️ '+d.email:'')+'</div>':'')
+      +licTags
+      +(canWrite ?
+        '<div class="vcard-actions">'
+        +'<button class="btn btn-secondary" onclick="openEdit(\''+d.id+'\')">✏️ แก้ไข</button>'
+        +(isSA ? '<button class="btn" style="background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger)" onclick="confirmToggle(\''+d.id+'\',\''+d.name.replace(/'/g,"\\'")+'\','+isActive+')">'+(!isActive?'✅ เปิดใช้':'🚫 ปิดใช้')+'</button>' : '')
+        +'</div>'
+       : '')
+      +'</div></div>';
+  }).join('');
+}
+
+/* ── License row helpers ── */
+function addLicRow(type, expires){
+  licRowCount++;
+  var rid = 'lic-'+licRowCount;
+  var div = document.createElement('div');
+  div.id  = rid;
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 32px;gap:8px;align-items:center;margin-bottom:8px';
+  div.innerHTML =
+    '<select class="fselect lic-type" style="font-size:13px">'
+    +'<option value="รถยนต์ส่วนบุคคล"'+(type==='รถยนต์ส่วนบุคคล'?' selected':'')+'>รถยนต์ส่วนบุคคล</option>'
+    +'<option value="รถยนต์สาธารณะ"'+(type==='รถยนต์สาธารณะ'?' selected':'')+'>รถยนต์สาธารณะ</option>'
+    +'<option value="รถบรรทุก"'+(type==='รถบรรทุก'?' selected':'')+'>รถบรรทุก</option>'
+    +'<option value="รถจักรยานยนต์"'+(type==='รถจักรยานยนต์'?' selected':'')+'>รถจักรยานยนต์</option>'
+    +'</select>'
+    +'<input type="date" class="finput lic-exp" style="font-size:13px" value="'+(expires||'')+'">'
+    +'<button type="button" onclick="document.getElementById(\''+rid+'\').remove()" style="background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger);border-radius:8px;width:32px;height:36px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>';
+  document.getElementById('lic-list').appendChild(div);
+}
+
+function getLicenses(){
+  var rows = document.querySelectorAll('#lic-list > div');
+  var result = [];
+  rows.forEach(function(row){
+    var t = row.querySelector('.lic-type');
+    var e = row.querySelector('.lic-exp');
+    if(t && e && e.value) result.push({ license_type: t.value, expires_at: e.value });
+  });
+  return result;
+}
+
+/* ── Modal ── */
+function openAdd(){
+  document.getElementById('fid').value    = '';
+  document.getElementById('modal-title').textContent = '👤 เพิ่มผู้ขับขี่ใหม่';
+  document.getElementById('fname').value  = '';
+  document.getElementById('fdept').value  = '';
+  document.getElementById('fphone').value = '';
+  document.getElementById('femail').value = '';
+  document.getElementById('fcenter').value = '';
+  document.getElementById('lic-list').innerHTML = '';
+  licRowCount = 0;
+  document.getElementById('fstatus-group').style.display = 'none';
+  showModal();
+}
+
+function openEdit(id){
+  var d = allDrivers.find(function(x){ return x.id === id; });
+  if(!d) return;
+  document.getElementById('fid').value    = d.id;
+  document.getElementById('modal-title').textContent = '✏️ แก้ไข — '+d.name;
+  document.getElementById('fname').value  = d.name        || '';
+  document.getElementById('fdept').value  = d.department  || '';
+  document.getElementById('fphone').value = d.phone       || '';
+  document.getElementById('femail').value = d.email       || '';
+  document.getElementById('fcenter').value = d.center_id  || '';
+  document.getElementById('fstatus').value = d.status     || 'ACTIVE';
+  document.getElementById('fstatus-group').style.display = 'block';
+  // โหลด licenses
+  document.getElementById('lic-list').innerHTML = '';
+  licRowCount = 0;
+  if(d.licenses && d.licenses.length){
+    d.licenses.forEach(function(l){ addLicRow(l.license_type || l.type, l.expires_at); });
+  }
+  showModal();
+}
+
+function showModal(){
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(function(){ document.getElementById('fname').focus(); }, 300);
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e){
+  if(e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function saveDriver(){
+  var id      = document.getElementById('fid').value;
+  var name    = document.getElementById('fname').value.trim();
+  var centerId = document.getElementById('fcenter').value;
+
+  if(!name){ alert('กรุณากรอกชื่อ-นามสกุล'); document.getElementById('fname').focus(); return; }
+  if(!centerId){ alert('กรุณาเลือกศูนย์วิจัย'); document.getElementById('fcenter').focus(); return; }
+
+  var payload = {
+    name:       name,
+    centerId:   centerId,
+    center_id:  centerId,
+    center_name: centersMap[centerId] || '',
+    department: document.getElementById('fdept').value.trim(),
+    phone:      document.getElementById('fphone').value.trim(),
+    email:      document.getElementById('femail').value.trim(),
+  };
+
+  if(id){
+    payload.id     = id;
+    payload.status = document.getElementById('fstatus').value;
+    API.post('updateDriver', payload).then(function(r){
+      if(r.success){
+        localStorage.setItem('fleet-data-updated', Date.now());
+        closeModal();
+        loadDrivers();
+        showToast('✅ บันทึกสำเร็จ');
+      } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+    });
+  } else {
+    API.post('addDriver', payload).then(function(r){
+      if(r.success){
+        localStorage.setItem('fleet-data-updated', Date.now());
+        closeModal();
+        loadDrivers();
+        showToast('✅ เพิ่มผู้ขับขี่เรียบร้อย');
+      } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+    });
+  }
+  // NOTE: ใบขับขี่ (getLicenses()) — เก็บไว้เพิ่มได้ถ้า addDriverLicense API พร้อม
+}
+
+/* ── Confirm toggle ── */
+function confirmToggle(id, name, isActive){
+  var action = isActive ? 'ปิดการใช้งาน' : 'เปิดการใช้งาน';
+  document.getElementById('cd-icon').textContent  = isActive ? '🚫' : '✅';
+  document.getElementById('cd-title').textContent = action+'ผู้ขับขี่';
+  document.getElementById('cd-msg').textContent   = 'ต้องการ'+action+' "'+name+'" ใช่ไหม?';
+  document.getElementById('cd-ok').textContent    = action;
+  document.getElementById('cd-ok').style.background   = isActive ? 'var(--danger)' : 'var(--success)';
+  document.getElementById('cd-ok').style.borderColor  = isActive ? 'var(--danger)' : 'var(--success)';
+  document.getElementById('cd-ok').onclick = function(){
+    closeConfirm();
+    toggleDriverStatus(id, isActive ? 'INACTIVE' : 'ACTIVE');
+  };
+  document.getElementById('confirm-dialog').classList.add('open');
+}
+
+function closeConfirm(){
+  document.getElementById('confirm-dialog').classList.remove('open');
+}
+
+function toggleDriverStatus(id, newStatus){
+  var d = allDrivers.find(function(x){ return x.id === id; });
+  if(!d) return;
+  var payload = { id: d.id, status: newStatus, name: d.name, centerId: d.center_id, center_id: d.center_id };
+  API.post('updateDriver', payload).then(function(r){
+    if(r.success){
+      localStorage.setItem('fleet-data-updated', Date.now());
+      loadDrivers();
+      showToast(newStatus === 'INACTIVE' ? '🚫 ปิดการใช้งานแล้ว' : '✅ เปิดการใช้งานแล้ว');
+    } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
+  });
+}
+
+/* ── Toast ── */
+function showToast(msg){
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--surface);padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:fadeIn .2s ease';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){ t.remove(); },300); }, 2200);
+}
+
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
+</script>
+</body>
+</html>

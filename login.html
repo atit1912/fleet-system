@@ -1,61 +1,308 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Intelligent Fleet SHE&amp;En — เข้าสู่ระบบ</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Intelligent Fleet SHE&amp;En</title>
 <script src="theme.js"></script>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body{background:linear-gradient(160deg,#03204F 0%,#043573 50%,#074DA0 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(91,151,236,.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(11,94,215,.12) 0%,transparent 50%);pointer-events:none;}
-.login-wrap{width:100%;max-width:400px;position:relative;z-index:1;}
-.login-logo{text-align:center;margin-bottom:32px;animation:fadeUp .4s ease;}
-.logo-ring{width:72px;height:72px;margin:0 auto 16px;background:linear-gradient(135deg,rgba(91,151,236,.3),rgba(11,94,215,.2));border:1.5px solid rgba(255,255,255,.15);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 8px 32px rgba(11,94,215,.4);backdrop-filter:blur(20px);}
-.logo-appname{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.02em;}
-.logo-tagline{font-size:13px;color:rgba(255,255,255,.45);margin-top:5px;}
-.login-card{background:rgba(255,255,255,.07);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,.13);border-radius:24px;padding:28px 24px;animation:fadeUp .4s .1s ease both;box-shadow:0 20px 60px rgba(3,32,79,.4);}
-.login-card .flabel{color:rgba(255,255,255,.7);}
-.login-card .finput{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;font-size:15px;padding:13px 14px;}
-.login-card .finput::placeholder{color:rgba(255,255,255,.3);}
-.login-card .finput:focus{border-color:rgba(91,151,236,.8);background:rgba(255,255,255,.12);box-shadow:0 0 0 3px rgba(91,151,236,.2);}
-.err-box{background:rgba(229,50,45,.15);border:1px solid rgba(229,50,45,.25);color:#FF8080;font-size:13px;padding:10px 14px;border-radius:10px;margin-bottom:16px;display:none;}
-.demo-box{margin-top:16px;padding:13px 14px;background:rgba(11,94,215,.15);border:1px solid rgba(91,151,236,.2);border-radius:12px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.7;}
-.demo-box strong{color:rgba(255,255,255,.65);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+:root{--neon:#00e5ff;--neon-dim:rgba(0,229,255,.2);--neon-glow:rgba(0,229,255,.6);--bg:#050b14;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  height:100%;background:var(--bg);color:#fff;
+  font-family:'Rajdhani',sans-serif;
+  overflow-x:hidden;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* ── Background ── */
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.bg-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+}
+.bg-grad{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 20% 10%,rgba(0,229,255,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%,rgba(255,0,255,.05) 0%,transparent 60%);
+}
+.scan-line{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 50%,rgba(0,229,255,.015) 50%);
+  background-size:100% 4px;
+  animation:scanMove 8s linear infinite;
+}
+@keyframes scanMove{0%{background-position:0 0;}100%{background-position:0 100vh;}}
+
+/* ── Hologram rings ── */
+.hologram-wrap{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  padding-top:40px;margin-bottom:8px;
+}
+.sci-fi-rings{
+  position:relative;width:130px;height:130px;
+  perspective:800px;transform-style:preserve-3d;
+  margin-bottom:16px;
+}
+.ring{position:absolute;inset:0;margin:auto;border-radius:50%;border:2px solid transparent;transform-style:preserve-3d;}
+.ring-1{width:100%;height:100%;border-top:3px solid #00e5ff;border-bottom:3px solid #ff00ff;animation:rotR1 6s linear infinite;box-shadow:0 0 12px rgba(0,229,255,.4),inset 0 0 12px rgba(255,0,255,.3);}
+.ring-2{width:75%;height:75%;border-left:3px solid #00ffaa;border-right:3px solid #ffaa00;animation:rotR2 4s linear infinite;box-shadow:0 0 12px rgba(0,255,170,.4),inset 0 0 12px rgba(255,170,0,.3);}
+.ring-3{width:50%;height:50%;border-top:3px dashed #ff3366;border-bottom:3px dashed #3366ff;animation:rotR3 8s linear infinite;}
+.core{position:absolute;width:22px;height:22px;inset:0;margin:auto;background:#fff;border-radius:50%;box-shadow:0 0 16px 8px #00e5ff,0 0 32px 16px #ff00ff;animation:pulseC 2s ease-in-out infinite alternate;}
+@keyframes rotR1{0%{transform:rotateX(60deg) rotateY(0deg) rotateZ(0deg);}100%{transform:rotateX(60deg) rotateY(360deg) rotateZ(360deg);}}
+@keyframes rotR2{0%{transform:rotateX(45deg) rotateY(90deg) rotateZ(0deg);}100%{transform:rotateX(45deg) rotateY(90deg) rotateZ(-360deg);}}
+@keyframes rotR3{0%{transform:rotateX(70deg) rotateY(45deg) rotateZ(0deg);}100%{transform:rotateX(70deg) rotateY(45deg) rotateZ(360deg);}}
+@keyframes pulseC{0%{transform:scale(.8);filter:hue-rotate(0deg);opacity:.8;}100%{transform:scale(1.2);filter:hue-rotate(90deg);opacity:1;}}
+
+/* ── Title ── */
+.title-area{text-align:center;margin-bottom:24px;z-index:2;}
+h1{font-family:'Orbitron',sans-serif;font-size:clamp(1.1rem,4vw,1.6rem);font-weight:700;
+  color:#fff;text-shadow:0 0 15px rgba(0,229,255,.6);letter-spacing:1px;margin-bottom:4px;}
+h2{font-size:.85rem;color:#8b9bb4;font-weight:500;letter-spacing:.5px;margin-bottom:6px;}
+.dev-name{font-size:1rem;color:var(--neon);text-shadow:0 0 8px var(--neon-glow);font-weight:500;}
+
+/* ── Login wrap ── */
+.login-wrap{
+  position:relative;z-index:2;
+  width:90%;max-width:380px;
+  padding-bottom:40px;
+  animation:slideUp .6s .1s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Input group ── */
+.input-group{margin-bottom:20px;position:relative;}
+.input-label{font-size:1rem;color:#fff;margin-bottom:6px;display:block;text-shadow:0 0 5px rgba(255,255,255,.2);}
+.map-pin{position:absolute;top:-2px;right:8px;color:var(--neon);font-size:1.1rem;filter:drop-shadow(0 0 5px var(--neon));}
+
+/* HUD border box */
+.hud-box{
+  position:relative;width:100%;height:56px;
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);
+  background:rgba(0,229,255,.05);padding:1.5px;
+}
+.hud-box::before{
+  content:'';position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(135deg,var(--neon) 0%,transparent 25%,transparent 75%,var(--neon) 100%);
+}
+.hud-inner{
+  width:100%;height:100%;
+  background:rgba(5,15,30,.85);
+  clip-path:polygon(13px 0,calc(100% - 13px) 0,100% 13px,100% calc(100% - 13px),calc(100% - 13px) 100%,13px 100%,0 calc(100% - 13px),0 13px);
+  display:flex;align-items:center;position:relative;
+}
+.circuit{position:absolute;right:4px;top:4px;bottom:4px;width:36px;opacity:.25;pointer-events:none;
+  background-image:linear-gradient(90deg,var(--neon) 1px,transparent 1px),linear-gradient(0deg,var(--neon) 1px,transparent 1px);
+  background-size:5px 5px;
+  clip-path:polygon(100% 0,100% 100%,0 100%,14px 50%,0 0);}
+.hud-input{
+  width:calc(100% - 48px);height:100%;
+  background:transparent;border:none;color:#fff;
+  padding:0 16px;font-size:1rem;font-family:'Rajdhani',sans-serif;outline:none;
+}
+.hud-input::placeholder{color:rgba(255,255,255,.3);}
+.hud-input:focus ~ .hud-focus{opacity:1;}
+.hud-focus{
+  position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .2s;
+  box-shadow:inset 0 0 20px rgba(0,229,255,.15);
+}
+
+/* eye toggle */
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  color:var(--neon);cursor:pointer;font-size:1.2rem;opacity:.8;
+  transition:.3s;z-index:10;background:none;border:none;padding:4px;}
+.eye-btn:hover{opacity:1;filter:drop-shadow(0 0 6px var(--neon));}
+
+/* error */
+.err-box{
+  background:rgba(229,50,45,.12);border:1px solid rgba(229,50,45,.25);
+  color:#FF7070;font-size:.9rem;padding:10px 14px;border-radius:6px;
+  margin-bottom:14px;display:none;
+  animation:shake .3s ease;
+}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}}
+
+/* login button */
+.btn-wrap{margin-top:24px;position:relative;}
+.login-btn{
+  width:100%;height:56px;
+  background:rgba(0,229,255,.08);
+  border:2px solid var(--neon);color:#fff;
+  font-size:1.2rem;font-family:'Orbitron',sans-serif;font-weight:600;letter-spacing:2px;
+  cursor:pointer;outline:none;transition:all .3s;position:relative;overflow:hidden;
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);
+  box-shadow:inset 0 0 20px rgba(0,229,255,.15);
+}
+.login-btn:hover:not(:disabled){
+  background:rgba(0,229,255,.25);
+  box-shadow:inset 0 0 20px rgba(0,229,255,.4),0 0 25px rgba(0,229,255,.3);
+  text-shadow:0 0 8px #fff;
+}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;}
+.btn-cir{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:16px;opacity:.35;pointer-events:none;
+  background-image:linear-gradient(90deg,var(--neon) 1px,transparent 1px),linear-gradient(0deg,var(--neon) 1px,transparent 1px);
+  background-size:5px 5px;}
+.btn-cir-l{left:8px;clip-path:polygon(0 0,100% 50%,0 100%);}
+.btn-cir-r{right:8px;clip-path:polygon(100% 0,0 50%,100% 100%);}
+.btn-text{position:relative;z-index:2;}
+
+/* ripple */
+.ripple{position:absolute;border-radius:50%;background:rgba(0,229,255,.3);transform:scale(0);animation:rippleA .5s linear;pointer-events:none;}
+@keyframes rippleA{to{transform:scale(4);opacity:0;}}
+
+/* loading dots */
+.loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite;}
+@keyframes dots{0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}100%{content:'';}}
+
+/* theme toggle */
+.theme-btn{position:fixed;top:14px;right:14px;z-index:99;
+  width:36px;height:36px;background:rgba(0,229,255,.1);
+  border:1px solid rgba(0,229,255,.25);border-radius:8px;
+  color:var(--neon);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.15s;}
+.theme-btn:hover{background:rgba(0,229,255,.2);}
 </style>
 </head>
 <body>
-<button class="theme-toggle" onclick="Theme.toggle()" style="position:fixed;top:16px;right:16px;z-index:99;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);">🌙</button>
-<div class="login-wrap">
-  <div class="login-logo">
-    <div class="logo-ring">🚗</div>
-    <div class="logo-appname">Intelligent Fleet SHE&amp;En</div>
-    <div class="logo-tagline">Intelligent Fleet Management System</div>
-  </div>
-  <div class="login-card">
-    <div class="err-box" id="err"></div>
-    <div class="fgroup"><label class="flabel">ชื่อผู้ใช้ หรือ อีเมล</label><input type="text" id="user" class="finput" placeholder="กรอก username หรืออีเมล" autocomplete="username"></div>
-    <div class="fgroup"><label class="flabel">รหัสผ่าน</label><input type="password" id="pass" class="finput" placeholder="••••••••" autocomplete="current-password"></div>
-    <button class="btn btn-primary btn-full btn-lg" id="btn" onclick="doLogin()">เข้าสู่ระบบ</button>
-    <div class="demo-box"><strong>ทดสอบระบบ</strong><br>username: <code style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:4px">admin</code> / รหัส: 1234</div>
+
+<div class="bg-wrap">
+  <div class="bg-grid"></div>
+  <div class="bg-grad"></div>
+  <div class="scan-line"></div>
+</div>
+
+<button class="theme-btn" id="theme-btn" onclick="Theme.toggle()">🌙</button>
+
+<!-- Hologram -->
+<div class="hologram-wrap">
+  <div class="sci-fi-rings">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+    <div class="core"></div>
   </div>
 </div>
-<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
+
+<!-- Login -->
+<div class="login-wrap">
+  <div class="title-area">
+    <h1>Intelligent Fleet SHE&amp;En</h1>
+    <h2>Intelligent Fleet Management System</h2>
+    <div class="dev-name">Developed by Atit Chimnan.</div>
+  </div>
+
+  <div class="err-box" id="err"></div>
+
+  <div class="input-group">
+    <label class="input-label">Username</label>
+    <i class="fas fa-map-marker-alt map-pin"></i>
+    <div class="hud-box">
+      <div class="hud-inner">
+        <input type="text" id="user" class="hud-input" placeholder="FLEET_ADMIN" autocomplete="username">
+        <div class="circuit"></div>
+        <div class="hud-focus"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Password</label>
+    <div class="hud-box">
+      <div class="hud-inner">
+        <input type="password" id="pass" class="hud-input" placeholder="••••••••" autocomplete="current-password">
+        <button class="eye-btn" id="eye-btn" type="button"><i class="far fa-eye" id="eye-icon"></i></button>
+        <div class="circuit" style="opacity:.1"></div>
+        <div class="hud-focus"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-wrap">
+    <button class="login-btn" id="btn" onclick="doLogin()">
+      <div class="btn-cir btn-cir-l"></div>
+      <span class="btn-text" id="btn-text">LOG IN</span>
+      <div class="btn-cir btn-cir-r"></div>
+    </button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
 <script>
-if(Auth.isLoggedIn())location.href='index.html';
+if(Auth.isLoggedIn()) location.href='index.html';
+
+// eye toggle
+document.getElementById('eye-btn').addEventListener('click', function(){
+  var inp  = document.getElementById('pass');
+  var icon = document.getElementById('eye-icon');
+  var show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  icon.className = show ? 'far fa-eye-slash' : 'far fa-eye';
+  this.style.color = show ? '#fff' : 'var(--neon)';
+});
+
+// ripple
+document.getElementById('btn').addEventListener('click', function(e){
+  var r = document.createElement('span');
+  r.classList.add('ripple');
+  var rect = this.getBoundingClientRect();
+  var size = Math.max(rect.width, rect.height);
+  r.style.cssText = 'width:'+size+'px;height:'+size+'px;left:'+(e.clientX-rect.left-size/2)+'px;top:'+(e.clientY-rect.top-size/2)+'px;';
+  this.appendChild(r);
+  setTimeout(function(){ r.remove(); }, 600);
+});
+
 function doLogin(){
-  var u=document.getElementById('user').value.trim();
-  var p=document.getElementById('pass').value;
-  var err=document.getElementById('err');var btn=document.getElementById('btn');
-  err.style.display='none';
-  if(!u||!p){err.textContent='กรุณากรอกข้อมูลให้ครบ';err.style.display='block';return;}
-  btn.textContent='กำลังเข้าสู่ระบบ...';btn.disabled=true;
+  var u   = document.getElementById('user').value.trim();
+  var p   = document.getElementById('pass').value;
+  var err = document.getElementById('err');
+  var btn = document.getElementById('btn');
+  var txt = document.getElementById('btn-text');
+  err.style.display = 'none';
+  if(!u||!p){
+    err.textContent = 'กรุณากรอกข้อมูลให้ครบ';
+    err.style.display = 'block'; return;
+  }
+  txt.className = 'btn-text loading-dots';
+  txt.textContent = 'AUTHENTICATING';
+  btn.disabled = true;
+
   API.call('login',{email:u,password:p}).then(function(r){
-    if(r.success&&r.user){Auth.setUser(r.user);location.href='index.html';}
-    else{err.textContent=r.error||'ไม่พบผู้ใช้ในระบบ';err.style.display='block';btn.textContent='เข้าสู่ระบบ';btn.disabled=false;}
-  }).catch(function(){err.textContent='เกิดข้อผิดพลาด กรุณาลองใหม่';err.style.display='block';btn.textContent='เข้าสู่ระบบ';btn.disabled=false;});
+    if(r.success && r.user){
+      txt.className = 'btn-text';
+      txt.textContent = '✓ ACCESS GRANTED';
+      btn.style.borderColor = '#00ffaa';
+      btn.style.boxShadow = 'inset 0 0 20px rgba(0,255,170,.3),0 0 30px rgba(0,255,170,.2)';
+      Auth.setUser(r.user);
+      setTimeout(function(){ location.href='index.html'; }, 600);
+    } else {
+      err.textContent = r.error || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+      err.style.display = 'block';
+      txt.className = 'btn-text'; txt.textContent = 'LOG IN';
+      btn.disabled = false;
+    }
+  }).catch(function(){
+    err.textContent = 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+    err.style.display = 'block';
+    txt.className = 'btn-text'; txt.textContent = 'LOG IN';
+    btn.disabled = false;
+  });
 }
-document.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+document.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+
+// sync theme icon
+document.addEventListener('DOMContentLoaded', function(){
+  var t = document.documentElement.getAttribute('data-theme');
+  document.getElementById('theme-btn').textContent = t==='dark' ? '☀️' : '🌙';
+});
 </script>
 </body>
 </html>

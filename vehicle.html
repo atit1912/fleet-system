@@ -199,6 +199,7 @@ function renderMaint(list){
     var km=VD?parseInt(VD.current_mileage)||0:0;
     var pct=m.dueMileage?Math.min(100,Math.round(km/m.dueMileage*100)):0;
     var pc=pct>=100?'pf-red':pct>=85?'pf-orange':'pf-blue';
+    var canWrite = typeof Auth !== 'undefined' && Auth.canWrite ? Auth.canWrite() : true;
     return '<div class="mcard mcard-'+(s==='OVERDUE'?'red':s==='DUE_SOON'?'orange':s==='APPOINTED'?'blue':'green')+'">'
       +'<div class="mcard-stripe"></div>'
       +'<div class="mcard-head">'
@@ -213,13 +214,70 @@ function renderMaint(list){
         +'<div style="font-size:10px;color:var(--t3);margin-top:3px">'+Number(km).toLocaleString()+' / '+Number(m.dueMileage).toLocaleString()+' กม.</div></div>'
         +(m.dueDate?'<div><div class="dp-lbl">ครบกำหนด</div><div style="font-size:13px;font-weight:600;margin-top:6px;color:'+co[s]+'">'+tDate(m.dueDate)+'</div></div>':'')
         +'</div>':'')
-      +(s!=='APPOINTED'?'<div class="appt-box"><div class="appt-lbl">📅 ตั้งวันนัดหมาย</div>'
+      // ── [ข้อ 5] บันทึก service record ──
+      +(canWrite?'<div class="appt-box" style="margin-top:10px">'
+        +'<div class="appt-lbl">✅ บันทึกเข้ารับบริการ</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+        +'<div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">วันที่เข้ารับบริการ</div>'
+        +'<input type="date" id="sr-date-'+m.type+'" class="finput" style="font-size:13px"></div>'
+        +'<div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">เลขไมล์ (กม.)</div>'
+        +'<input type="number" id="sr-km-'+m.type+'" class="finput" style="font-size:13px" placeholder="กรอกเลขไมล์" value="'+(VD?VD.current_mileage:'')+'"></div>'
+        +'</div>'
+        +'<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">รายการที่ทำ</div>'
+        +'<input type="text" id="sr-tasks-'+m.type+'" class="finput" style="font-size:13px" placeholder="เช่น เปลี่ยนน้ำมันเครื่อง, ตรวจเช็ก 20 รายการ"></div>'
+        +'<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">หมายเหตุ</div>'
+        +'<input type="text" id="sr-note-'+m.type+'" class="finput" style="font-size:13px" placeholder="ไม่บังคับ"></div>'
+        +'<div style="display:flex;gap:8px">'
+        +'<button class="btn btn-primary btn-sm" style="flex:1" onclick="saveServiceRecord(\''+m.type+'\',true)">💾 บันทึก + ปิดนัด</button>'
+        +'<button class="btn btn-secondary btn-sm" onclick="saveServiceRecord(\''+m.type+'\',false)">บันทึก</button>'
+        +'</div></div>':'')
+      // ── นัดหมาย ──
+      +(canWrite && s!=='APPOINTED'?'<div class="appt-box"><div class="appt-lbl">📅 ตั้งวันนัดหมาย</div>'
         +'<div style="display:flex;gap:8px;align-items:center">'
         +'<input type="date" id="a-'+m.type+'" class="finput" style="flex:1">'
         +'<button class="btn btn-primary btn-sm" onclick="setA(\''+m.type+'\')">บันทึก</button>'
         +'</div></div>':'')
       +'</div></div>';
   }).join('');
+
+  // ตั้งค่า default date วันนี้
+  list.forEach(function(m){
+    var dateEl = document.getElementById('sr-date-'+m.type);
+    if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().split('T')[0];
+  });
+}
+
+function saveServiceRecord(type, closeAppt){
+  var dateEl  = document.getElementById('sr-date-'+type);
+  var kmEl    = document.getElementById('sr-km-'+type);
+  var tasksEl = document.getElementById('sr-tasks-'+type);
+  var noteEl  = document.getElementById('sr-note-'+type);
+
+  var servicedAt = dateEl ? dateEl.value : '';
+  var km         = kmEl   ? parseInt(kmEl.value) || 0 : 0;
+  var tasks      = tasksEl ? tasksEl.value.trim() : '';
+  var note       = noteEl  ? noteEl.value.trim()  : '';
+
+  if(!servicedAt){ alert('กรุณาเลือกวันที่เข้ารับบริการ'); return; }
+  if(!km){ alert('กรุณากรอกเลขไมล์'); return; }
+
+  API.post('addServiceRecord', {
+    vehicleId:          VID,
+    maintenanceType:    type,
+    servicedAt:         servicedAt,
+    mileageAtService:   km,
+    tasks:              tasks,
+    notes:              note,
+    appointmentClosed:  closeAppt ? 'true' : 'false'
+  }).then(function(r){
+    if(r.success){
+      localStorage.setItem('fleet-data-updated', Date.now());
+      alert('บันทึกเรียบร้อย ✅');
+      loadV();
+    } else {
+      alert('เกิดข้อผิดพลาด: '+(r.error||''));
+    }
+  });
 }
 
 function setA(t){

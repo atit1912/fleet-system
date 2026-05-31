@@ -237,7 +237,10 @@ function renderTimeline(records, vehicle){
       +'<div class="tl-content">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">'
       +'<div class="tl-date">'+tDate(r.serviced_at)+'</div>'
-      +(canWrite?'<button onclick="openEditRecord(\''+r.id+'\',\''+type+'\',\''+dateStr+'\','+Number(r.mileage_at_service||0)+',\''+tasksEsc+'\',\''+notesEsc+'\')" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--t3);font-size:10px;padding:2px 7px;cursor:pointer;flex-shrink:0">✏️ แก้</button>':'')
+      +(canWrite?'<div style="display:flex;gap:4px">'
+      +'<button onclick="openEditRecord(\''+r.id+'\',\''+type+'\',\''+dateStr+'\','+Number(r.mileage_at_service||0)+',\''+tasksEsc+'\',\''+notesEsc+'\')" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--t3);font-size:10px;padding:2px 7px;cursor:pointer">✏️ แก้</button>'
+      +'<button onclick="deleteRecord(\''+r.id+'\')" style="background:none;border:1px solid var(--danger);border-radius:6px;color:var(--danger);font-size:10px;padding:2px 7px;cursor:pointer">🗑️</button>'
+      +'</div>':'')
       +'</div>'
       +'<div class="tl-title">'+title+'</div>'
       +'<div class="tl-meta">🛣️ '+Number(r.mileage_at_service||0).toLocaleString()+' กม.</div>'
@@ -472,8 +475,19 @@ function updateModalTasks(existingTasks){
   document.getElementById('modal-checklist').innerHTML = html;
 }
 
+function deleteRecord(recordId){
+  if(!confirm('ลบรายการนี้ใช่ไหม?')) return;
+  API.post('deleteServiceRecord',{recordId:recordId}).then(function(r){
+    if(r.success){
+      localStorage.setItem('fleet-data-updated', Date.now());
+      loadV();
+    } else {
+      alert('เกิดข้อผิดพลาด: '+(r.error||''));
+    }
+  });
+}
+
 function saveModalRecord(){
-  var recordId  = document.getElementById('modal-record-id').value;
   var type      = document.getElementById('modal-type').value;
   var date      = document.getElementById('modal-date').value;
   var km        = parseInt(document.getElementById('modal-km').value) || 0;

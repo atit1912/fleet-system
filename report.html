@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-/* ══ Vehicle selector ══ */
 .vsel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
 @media(min-width:480px){.vsel-grid{grid-template-columns:repeat(3,1fr);}}
 @media(min-width:768px){.vsel-grid{grid-template-columns:repeat(4,1fr);}}
@@ -19,8 +18,6 @@
 .vsel-plate{font-size:15px;font-weight:800;font-family:monospace;color:var(--t1);letter-spacing:1px;}
 .vsel-model{font-size:10px;color:var(--t3);margin-top:2px;}
 .vsel-center{font-size:10px;color:var(--t4);margin-top:1px;}
-
-/* ══ Report header card ══ */
 .rpt-header{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:var(--sh1);}
 .rpt-header-row{display:flex;align-items:center;gap:12px;}
 .rpt-plate-box{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:4px 12px;font-size:20px;font-weight:800;font-family:monospace;color:var(--t1);letter-spacing:1.5px;flex-shrink:0;}
@@ -32,14 +29,10 @@
 .rpt-donut svg{transform:rotate(-90deg);}
 .rpt-donut-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--t1);line-height:1;}
 .rpt-donut-lbl{font-size:9px;color:var(--t3);margin-top:2px;}
-
-/* ══ Tab bar ══ */
 .rpt-tabs{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .rpt-tab{flex:1;padding:10px 8px;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;text-align:center;transition:all .15s;border:none;background:none;}
 .rpt-tab.active{background:var(--p600);color:#fff;font-weight:600;}
 [data-theme="dark"] .rpt-tab.active{background:#2E78E4;}
-
-/* ══ Timeline ══ */
 .tl-wrap{padding:4px 0;}
 .tl-item{display:flex;gap:14px;position:relative;padding-bottom:20px;}
 .tl-item:last-child{padding-bottom:0;}
@@ -58,8 +51,6 @@
 [data-theme="dark"] .tl-badge-done{background:#002e1e;color:#3dffc0;border-color:#005c3a;}
 [data-theme="dark"] .tl-badge-late{background:#2e0a0a;color:#ff8080;border-color:#5c1a1a;}
 .tl-tasks{font-size:12px;color:var(--t2);margin-top:6px;background:var(--bg);border-left:3px solid var(--border);border-radius:0 8px 8px 0;padding:8px 12px;line-height:1.6;}
-
-/* ══ Plan tab ══ */
 .plan-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
 .plan-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .plan-body{flex:1;min-width:0;}
@@ -68,84 +59,43 @@
 .plan-right{text-align:right;flex-shrink:0;}
 .plan-due{font-size:12px;font-weight:700;}
 .plan-km{font-size:10px;color:var(--t3);margin-top:2px;}
-
-/* ══ Summary tab ══ */
 .sum-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-light);}
 .sum-row:last-child{border-bottom:none;}
 .sum-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0;}
-
-/* ══ Export ══ */
 .export-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end;}
 .export-row .fgroup{flex:1;min-width:120px;margin:0;}
 .btn-excel{background:#1D6F42;color:#fff;border:none;font-size:12px;font-weight:600;padding:10px 14px;border-radius:10px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all .18s;flex-shrink:0;}
 .btn-excel:hover{background:#155232;}
 .btn-pdf{background:#C0392B;color:#fff;border:none;font-size:12px;font-weight:600;padding:10px 14px;border-radius:10px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all .18s;flex-shrink:0;}
 .btn-pdf:hover{background:#962d22;}
-
-/* ══ Empty / loading ══ */
 .rpt-empty{text-align:center;padding:40px 20px;color:var(--t3);}
 .rpt-empty-icon{font-size:40px;margin-bottom:8px;opacity:.5;}
-
-/* ══ Print — timeline สวยงามมีสี ══ */
 @media print{
   .topbar,.sidebar,.bottom-nav,.overlay,.export-row,.rpt-tabs,.vsel-grid,.vsel-card{display:none!important;}
   .main{margin-left:0!important;padding-bottom:0!important;}
   body{background:#fff!important;color:#000!important;font-size:11px;}
-
-  /* header */
   .rpt-header{border:1.5px solid #dde3ee!important;box-shadow:none!important;page-break-inside:avoid;margin-bottom:20px!important;}
   .rpt-plate-box{background:#f0f4ff!important;border:2px solid #0B5ED7!important;color:#0B5ED7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .rpt-model{font-size:15px!important;font-weight:700!important;color:#000!important;}
   .rpt-center{color:#444!important;}
   .rpt-donut-pct{color:#000!important;}
   .rpt-donut-lbl{color:#666!important;}
-
-  /* แสดง tab ประวัติ */
   #tab-hist{display:block!important;}
   #tab-plan{display:none!important;}
   #tab-sum{display:none!important;}
   #print-title{display:block!important;}
-
-  /* timeline */
   .tl-item{page-break-inside:avoid;margin-bottom:4px;}
   .tl-dot{-webkit-print-color-adjust:exact;print-color-adjust:exact;border:2px solid #fff!important;}
   .tl-line{background:#dde3ee!important;}
   .tl-date{color:#666!important;}
   .tl-title{color:#000!important;font-size:13px!important;}
-
-  /* badge สี */
-  .tl-badge-done{
-    background:#EDFAF3!important;color:#1C8A45!important;
-    border:1px solid #A3E4BF!important;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-  }
-  .tl-badge-late{
-    background:#FEF0EF!important;color:#E5322D!important;
-    border:1px solid #FBCFCE!important;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-  }
-
-  /* tasks box — แก้ตัวหนังสือจาง */
-  .tl-tasks{
-    background:#f8f9ff!important;
-    border-left:3px solid #0B5ED7!important;
-    color:#222!important;           /* ← แก้จาง */
-    font-size:11px!important;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-  }
-  .tl-km{
-    background:#f0f4ff!important;border:1px solid #c0d9fa!important;
-    color:#0B5ED7!important;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-  }
-
-  /* donut */
+  .tl-badge-done{background:#EDFAF3!important;color:#1C8A45!important;border:1px solid #A3E4BF!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .tl-badge-late{background:#FEF0EF!important;color:#E5322D!important;border:1px solid #FBCFCE!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .tl-tasks{background:#f8f9ff!important;border-left:3px solid #0B5ED7!important;color:#222!important;font-size:11px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .tl-km{background:#f0f4ff!important;border:1px solid #c0d9fa!important;color:#0B5ED7!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   #rpt-donut-arc{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-
   @page{margin:12mm 15mm;size:A4;}
 }
-
-/* print title — hidden on screen */
 #print-title{display:none;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #333;}
 #print-title h2{font-size:16px;font-weight:700;margin-bottom:4px;}
 #print-title p{font-size:12px;color:#666;}
@@ -169,6 +119,9 @@
   <a href="index.html"       class="nav-item"><span class="nav-icon">🏠</span>Dashboard</a>
   <a href="vehicles.html"    class="nav-item"><span class="nav-icon">🚗</span>รถยนต์</a>
   <a href="maintenance.html" class="nav-item"><span class="nav-icon">🔧</span>บำรุงรักษา</a>
+  <div class="sb-section">จัดการข้อมูล</div>
+  <a href="manage-vehicles.html" class="nav-item super-only"><span class="nav-icon">🚙</span>จัดการรถยนต์</a>
+  <a href="manage-drivers.html" class="nav-item super-only"><span class="nav-icon">👤</span>จัดการผู้ขับขี่</a>
   <div class="sb-section">ข้อมูล</div>
   <a href="drivers.html"     class="nav-item"><span class="nav-icon">👤</span>ผู้ขับขี่</a>
   <a href="service.html"     class="nav-item"><span class="nav-icon">📋</span>ประวัติการเข้ารับบริการ</a>
@@ -176,43 +129,23 @@
   <div class="sb-spacer"></div>
   <div class="sb-footer"><button class="logout-btn" onclick="Auth.logout()">🚪 ออกจากระบบ</button></div>
 </nav>
-
 <main class="main">
   <header class="topbar">
     <button class="menu-btn" onclick="openSB()">☰</button>
     <div class="topbar-center"><div class="topbar-title">รายงานผู้บริหาร</div></div>
-    <div class="topbar-right">
-      <button class="theme-toggle" onclick="Theme.toggle()">🌙</button>
-    </div>
+    <div class="topbar-right"><button class="theme-toggle" onclick="Theme.toggle()">🌙</button></div>
   </header>
-
   <div class="page-body" style="padding-bottom:calc(var(--nav-h) + 24px)">
-
-    <!-- Filter + Export -->
     <div class="export-row">
-      <div class="fgroup">
-        <label class="flabel">ศูนย์วิจัย</label>
+      <div class="fgroup"><label class="flabel">ศูนย์วิจัย</label>
         <select class="fselect" id="rc" onchange="loadVehicles()"><option value="ALL">ทุกศูนย์</option></select>
       </div>
       <button class="btn-excel" onclick="exportExcel()">📊 Excel</button>
       <button class="btn-pdf"   onclick="exportPDF()">📄 PDF</button>
     </div>
-
-    <!-- Vehicle selector -->
-    <div id="vsel-wrap">
-      <div class="rpt-empty"><div class="rpt-empty-icon">🚗</div>กำลังโหลดรายการรถ...</div>
-    </div>
-
-    <!-- Report area -->
+    <div id="vsel-wrap"><div class="rpt-empty"><div class="rpt-empty-icon">🚗</div>กำลังโหลดรายการรถ...</div></div>
     <div id="rpt-area" style="display:none">
-
-      <!-- Print title (hidden on screen) -->
-      <div id="print-title">
-        <h2 id="pt-title">รายงานการเข้ารับบริการ</h2>
-        <p id="pt-sub"></p>
-      </div>
-
-      <!-- Header card -->
+      <div id="print-title"><h2 id="pt-title">รายงานการเข้ารับบริการ</h2><p id="pt-sub"></p></div>
       <div class="rpt-header">
         <div class="rpt-header-row">
           <div class="rpt-plate-box" id="rpt-plate">—</div>
@@ -233,35 +166,17 @@
           </div>
         </div>
       </div>
-
-      <!-- Tabs -->
       <div class="rpt-tabs">
         <button class="rpt-tab active" onclick="showRptTab('hist',this)">📋 ประวัติ</button>
         <button class="rpt-tab" onclick="showRptTab('plan',this)">📅 แผนถัดไป</button>
         <button class="rpt-tab" onclick="showRptTab('sum',this)">📊 สรุปรายการ</button>
       </div>
-
-      <!-- Tab: ประวัติ -->
-      <div id="tab-hist">
-        <div id="tl-hist" class="tl-wrap"></div>
-      </div>
-
-      <!-- Tab: แผนถัดไป -->
-      <div id="tab-plan" style="display:none">
-        <div id="plan-list"></div>
-      </div>
-
-      <!-- Tab: สรุปรายการ -->
-      <div id="tab-sum" style="display:none">
-        <div class="icard" style="padding:0 16px">
-          <div id="sum-list"></div>
-        </div>
-      </div>
-
+      <div id="tab-hist"><div id="tl-hist" class="tl-wrap"></div></div>
+      <div id="tab-plan" style="display:none"><div id="plan-list"></div></div>
+      <div id="tab-sum" style="display:none"><div class="icard" style="padding:0 16px"><div id="sum-list"></div></div></div>
     </div>
   </div>
 </main>
-
 <nav class="bottom-nav">
   <a href="index.html"       class="bnav"><div class="bnav-wrap">🏠</div><span>หน้าหลัก</span></a>
   <a href="vehicles.html"    class="bnav"><div class="bnav-wrap">🚗</div><span>รถยนต์</span></a>
@@ -270,8 +185,6 @@
   <a href="report.html"      class="bnav active"><div class="bnav-wrap">📊</div><span>รายงาน</span></a>
 </nav>
 </div>
-
-<!-- Modal แก้ไข/เพิ่ม service record -->
 <div id="rpt-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center;padding:16px">
   <div style="background:var(--surface);border-radius:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.4)">
     <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
@@ -280,8 +193,7 @@
     </div>
     <div style="padding:16px 20px">
       <input type="hidden" id="rpt-modal-rid">
-      <div class="fgroup">
-        <label class="flabel">ประเภทการบำรุงรักษา</label>
+      <div class="fgroup"><label class="flabel">ประเภทการบำรุงรักษา</label>
         <select id="rpt-modal-type" class="fselect">
           <option value="INITIAL_1000KM">ตรวจเช็กระยะ 1,000 กม.แรก</option>
           <option value="ROUTINE_10K">ตรวจเช็กตามระยะ (10,000/6 เดือน)</option>
@@ -291,23 +203,11 @@
         </select>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="fgroup">
-          <label class="flabel">วันที่เข้ารับบริการ</label>
-          <input type="date" id="rpt-modal-date" class="finput">
-        </div>
-        <div class="fgroup">
-          <label class="flabel">เลขไมล์ตอนเข้า (กม.)</label>
-          <input type="number" id="rpt-modal-km" class="finput" placeholder="เช่น 10250">
-        </div>
+        <div class="fgroup"><label class="flabel">วันที่เข้ารับบริการ</label><input type="date" id="rpt-modal-date" class="finput"></div>
+        <div class="fgroup"><label class="flabel">เลขไมล์ตอนเข้า (กม.)</label><input type="number" id="rpt-modal-km" class="finput" placeholder="เช่น 10250"></div>
       </div>
-      <div class="fgroup">
-        <label class="flabel">รายการที่ทำ</label>
-        <input type="text" id="rpt-modal-tasks" class="finput" placeholder="เช่น เปลี่ยนน้ำมันเครื่อง">
-      </div>
-      <div class="fgroup">
-        <label class="flabel">หมายเหตุ</label>
-        <input type="text" id="rpt-modal-notes" class="finput" placeholder="ไม่บังคับ">
-      </div>
+      <div class="fgroup"><label class="flabel">รายการที่ทำ</label><input type="text" id="rpt-modal-tasks" class="finput" placeholder="เช่น เปลี่ยนน้ำมันเครื่อง"></div>
+      <div class="fgroup"><label class="flabel">หมายเหตุ</label><input type="text" id="rpt-modal-notes" class="finput" placeholder="ไม่บังคับ"></div>
       <div style="display:flex;gap:8px;margin-top:8px">
         <button class="btn btn-primary btn-full" onclick="saveRptRecord()">💾 บันทึก</button>
         <button class="btn btn-secondary" onclick="closeRptModal()" style="flex-shrink:0">ยกเลิก</button>
@@ -315,455 +215,150 @@
     </div>
   </div>
 </div>
-
-<script src="config.js"></script>
-<script src="api.js"></script>
-<script src="auth.js"></script>
+<script src="config.js"></script><script src="api.js"></script><script src="auth.js"></script>
 <script>
 var MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function tDate(s){
-  if(!s) return '—';
-  try{ var d=new Date(s); return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543); }
-  catch(e){ return s; }
-}
-
-var TYPE_ICON  = {INITIAL_1000KM:'🔑',ROUTINE_10K:'🔧',TIRE_ROTATION:'🔄',TIRE_REPLACEMENT:'🛞',BATTERY_REPLACEMENT:'🔋'};
-var TYPE_LABEL = {INITIAL_1000KM:'ตรวจเช็กระยะ 1,000 กม.แรก',ROUTINE_10K:'ตรวจเช็กตามระยะ (10,000/6 เดือน)',TIRE_ROTATION:'สลับยาง',TIRE_REPLACEMENT:'เปลี่ยนยาง',BATTERY_REPLACEMENT:'เปลี่ยนแบตเตอรี่'};
-var TYPE_COLOR = {INITIAL_1000KM:'var(--p600)',ROUTINE_10K:'var(--success)',TIRE_ROTATION:'var(--warning)',TIRE_REPLACEMENT:'var(--danger)',BATTERY_REPLACEMENT:'#8B5CF6'};
-var TYPE_BG    = {INITIAL_1000KM:'var(--p100)',ROUTINE_10K:'var(--success-bg)',TIRE_ROTATION:'var(--warning-bg)',TIRE_REPLACEMENT:'var(--danger-bg)',BATTERY_REPLACEMENT:'#F3E8FF'};
-
-var allVehicles = [];
-var curVehicle  = null;
-var curAudit    = null;
-
-document.addEventListener('DOMContentLoaded', function(){
+function tDate(s){if(!s)return'—';try{var d=new Date(s);return d.getDate()+' '+MS[d.getMonth()]+' '+(d.getFullYear()+543);}catch(e){return s;}}
+var TYPE_ICON={INITIAL_1000KM:'🔑',ROUTINE_10K:'🔧',TIRE_ROTATION:'🔄',TIRE_REPLACEMENT:'🛞',BATTERY_REPLACEMENT:'🔋'};
+var TYPE_LABEL={INITIAL_1000KM:'ตรวจเช็กระยะ 1,000 กม.แรก',ROUTINE_10K:'ตรวจเช็กตามระยะ (10,000/6 เดือน)',TIRE_ROTATION:'สลับยาง',TIRE_REPLACEMENT:'เปลี่ยนยาง',BATTERY_REPLACEMENT:'เปลี่ยนแบตเตอรี่'};
+var TYPE_COLOR={INITIAL_1000KM:'var(--p600)',ROUTINE_10K:'var(--success)',TIRE_ROTATION:'var(--warning)',TIRE_REPLACEMENT:'var(--danger)',BATTERY_REPLACEMENT:'#8B5CF6'};
+var TYPE_BG={INITIAL_1000KM:'var(--p100)',ROUTINE_10K:'var(--success-bg)',TIRE_ROTATION:'var(--warning-bg)',TIRE_REPLACEMENT:'var(--danger-bg)',BATTERY_REPLACEMENT:'#F3E8FF'};
+var allVehicles=[],curVehicle=null,curAudit=null;
+document.addEventListener('DOMContentLoaded',function(){
   requireAuth();
-  var u = Auth.getUser();
-  if(u){
-    var ini = u.name ? u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2) : 'AD';
-    document.getElementById('sb-av').textContent = ini;
-    document.getElementById('sb-nm').textContent = u.name;
-    document.getElementById('sb-rl').textContent = roleLabel(u.role);
-  }
-  API.call('getCenters').then(function(r){
-    if(!r.success) return;
-    var s = document.getElementById('rc');
-    r.data.forEach(function(c){
-      var o = document.createElement('option');
-      o.value = c.id; o.textContent = c.name; s.appendChild(o);
-    });
-  });
+  var u=Auth.getUser();
+  if(u){var ini=u.name?u.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'AD';document.getElementById('sb-av').textContent=ini;document.getElementById('sb-nm').textContent=u.name;document.getElementById('sb-rl').textContent=roleLabel(u.role);}
+  API.call('getCenters').then(function(r){if(!r.success)return;var s=document.getElementById('rc');r.data.forEach(function(c){var o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o);});});
   loadVehicles();
-
-  window.addEventListener('focus', function(){
-    var lastUpdate = parseInt(localStorage.getItem('fleet-data-updated') || '0');
-    var lastCheck  = parseInt(localStorage.getItem('fleet-last-check')   || '0');
-    if(lastUpdate > lastCheck){
-      localStorage.setItem('fleet-last-check', Date.now());
-      loadVehicles();
-    }
+  window.addEventListener('focus',function(){
+    var lastUpdate=parseInt(localStorage.getItem('fleet-data-updated')||'0');
+    var lastCheck=parseInt(localStorage.getItem('fleet-last-check')||'0');
+    if(lastUpdate>lastCheck){localStorage.setItem('fleet-last-check',Date.now());loadVehicles();}
   });
 });
-
-/* ══ โหลดรายการรถ ══ */
 function loadVehicles(){
-  var centerId = document.getElementById('rc').value;
-  document.getElementById('vsel-wrap').innerHTML =
-    '<div class="rpt-empty"><div class="rpt-empty-icon">⏳</div>กำลังโหลด...</div>';
-  document.getElementById('rpt-area').style.display = 'none';
-
-  var timedOut = false;
-  var timer = setTimeout(function(){
-    timedOut = true;
-    document.getElementById('vsel-wrap').innerHTML =
-      '<div class="rpt-empty"><div class="rpt-empty-icon">⚠️</div>โหลดนานเกินไป<br>'
-      +'<button class="btn btn-secondary btn-sm" onclick="loadVehicles()" style="margin-top:8px">ลองใหม่</button></div>';
-  }, 15000);
-
-  var params = centerId !== 'ALL' ? {centerId: centerId} : {};
-  API.call('getVehicles', params).then(function(r){
-    if(timedOut) return;
-    clearTimeout(timer);
-    allVehicles = r.success ? r.data || [] : [];
-    if(!allVehicles.length){
-      document.getElementById('vsel-wrap').innerHTML =
-        '<div class="rpt-empty"><div class="rpt-empty-icon">🚗</div>ไม่พบข้อมูลรถ</div>';
-      return;
-    }
+  var centerId=document.getElementById('rc').value;
+  document.getElementById('vsel-wrap').innerHTML='<div class="rpt-empty"><div class="rpt-empty-icon">⏳</div>กำลังโหลด...</div>';
+  document.getElementById('rpt-area').style.display='none';
+  var timedOut=false;
+  var timer=setTimeout(function(){timedOut=true;document.getElementById('vsel-wrap').innerHTML='<div class="rpt-empty"><div class="rpt-empty-icon">⚠️</div>โหลดนานเกินไป<br><button class="btn btn-secondary btn-sm" onclick="loadVehicles()" style="margin-top:8px">ลองใหม่</button></div>';},15000);
+  var params=centerId!=='ALL'?{centerId:centerId}:{};
+  API.call('getVehicles',params).then(function(r){
+    if(timedOut)return;clearTimeout(timer);
+    allVehicles=r.success?r.data||[]:[]; 
+    if(!allVehicles.length){document.getElementById('vsel-wrap').innerHTML='<div class="rpt-empty"><div class="rpt-empty-icon">🚗</div>ไม่พบข้อมูลรถ</div>';return;}
     renderVselGrid(allVehicles);
-  }).catch(function(){
-    if(timedOut) return;
-    clearTimeout(timer);
-    document.getElementById('vsel-wrap').innerHTML =
-      '<div class="rpt-empty"><div class="rpt-empty-icon">❌</div>เกิดข้อผิดพลาด<br>'
-      +'<button class="btn btn-secondary btn-sm" onclick="loadVehicles()" style="margin-top:8px">ลองใหม่</button></div>';
-  });
+  }).catch(function(){if(timedOut)return;clearTimeout(timer);document.getElementById('vsel-wrap').innerHTML='<div class="rpt-empty"><div class="rpt-empty-icon">❌</div>เกิดข้อผิดพลาด<br><button class="btn btn-secondary btn-sm" onclick="loadVehicles()" style="margin-top:8px">ลองใหม่</button></div>';});
 }
-
 function renderVselGrid(vehicles){
-  var bcolors = {
-    'OVERDUE': 'background:#fff0f0;color:#c0392b;border:1px solid #fbc6c6',
-    'DUE_SOON':'background:#fffbea;color:#9a6700;border:1px solid #ffe082',
-    'APPOINTED':'background:#eef3ff;color:#3d5fc7;border:1px solid #c3d0f7',
-    'NORMAL':  'background:#e6faf4;color:#0a7c5c;border:1px solid #b2eeda',
-  };
-  var lmap = {OVERDUE:'❌ ล่าช้า',DUE_SOON:'⚠️ ใกล้ถึง',APPOINTED:'📅 นัดแล้ว',NORMAL:'✅ ปกติ'};
-  var html = '<div class="vsel-grid">';
-  vehicles.forEach(function(v, i){
-    var s = v.worstStatus || 'NORMAL';
-    html +=
-      '<div class="vsel-card" id="vs-'+i+'" onclick="selectVehicle('+i+')">'
-      +'<div class="vsel-plate">'+v.plate_number+'</div>'
-      +'<div class="vsel-model">'+(v.brand||'')+' '+(v.model||'')+'</div>'
-      +'<div class="vsel-center">'+(v.center_name||'')+'</div>'
-      +'<div style="margin-top:6px">'
-      +'<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;'+bcolors[s]+'">'+lmap[s]+'</span>'
-      +'</div>'
-      +'</div>';
+  var bcolors={'OVERDUE':'background:#fff0f0;color:#c0392b;border:1px solid #fbc6c6','DUE_SOON':'background:#fffbea;color:#9a6700;border:1px solid #ffe082','APPOINTED':'background:#eef3ff;color:#3d5fc7;border:1px solid #c3d0f7','NORMAL':'background:#e6faf4;color:#0a7c5c;border:1px solid #b2eeda'};
+  var lmap={OVERDUE:'❌ ล่าช้า',DUE_SOON:'⚠️ ใกล้ถึง',APPOINTED:'📅 นัดแล้ว',NORMAL:'✅ ปกติ'};
+  var html='<div class="vsel-grid">';
+  vehicles.forEach(function(v,i){
+    var s=v.worstStatus||'NORMAL';
+    html+='<div class="vsel-card" id="vs-'+i+'" onclick="selectVehicle('+i+')"><div class="vsel-plate">'+v.plate_number+'</div><div class="vsel-model">'+(v.brand||'')+' '+(v.model||'')+'</div><div class="vsel-center">'+(v.center_name||'')+'</div><div style="margin-top:6px"><span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;'+bcolors[s]+'">'+lmap[s]+'</span></div></div>';
   });
-  html += '</div>';
-  document.getElementById('vsel-wrap').innerHTML = html;
+  html+='</div>';
+  document.getElementById('vsel-wrap').innerHTML=html;
 }
-
-/* ══ เลือกรถ ══ */
 function selectVehicle(idx){
-  document.querySelectorAll('.vsel-card').forEach(function(c){ c.classList.remove('active'); });
+  document.querySelectorAll('.vsel-card').forEach(function(c){c.classList.remove('active');});
   document.getElementById('vs-'+idx).classList.add('active');
-
-  var v = allVehicles[idx];
-  curVehicle = v;
-
-  // แสดง loading ก่อน + scroll ลงมา
-  document.getElementById('rpt-area').style.display = 'block';
-  document.getElementById('rpt-plate').textContent  = v.plate_number;
-  document.getElementById('rpt-model').textContent  = (v.brand||'')+' '+(v.model||'');
-  document.getElementById('rpt-center').textContent = v.center_name||'';
-  document.getElementById('rpt-km-badge').innerHTML = '';
-  document.getElementById('rpt-pct').textContent    = '...';
-  document.getElementById('tl-hist').innerHTML = '<div class="loading">⏳ กำลังโหลด...</div>';
-  document.getElementById('plan-list').innerHTML = '';
-  document.getElementById('sum-list').innerHTML  = '';
+  var v=allVehicles[idx]; curVehicle=v;
+  document.getElementById('rpt-area').style.display='block';
+  document.getElementById('rpt-plate').textContent=v.plate_number;
+  document.getElementById('rpt-model').textContent=(v.brand||'')+' '+(v.model||'')+' '+(v.color?'· '+v.color:'');
+  document.getElementById('rpt-center').textContent=v.center_name||''
+  document.getElementById('rpt-km-badge').innerHTML='';
+  document.getElementById('rpt-pct').textContent='...';
+  document.getElementById('tl-hist').innerHTML='<div class="loading">⏳ กำลังโหลด...</div>';
+  document.getElementById('plan-list').innerHTML='';
+  document.getElementById('sum-list').innerHTML='';
   document.getElementById('rpt-donut-arc').setAttribute('stroke-dasharray','0 150.8');
-
-  // [FIX-SCROLL] scroll ไป rpt-area โดย offset topbar + padding
-  setTimeout(function(){
-    var el    = document.getElementById('rpt-area');
-    var topH  = (document.querySelector('.topbar') || {offsetHeight:56}).offsetHeight;
-    var y = el.getBoundingClientRect().top + window.pageYOffset - topH - 12;
-    window.scrollTo({top: Math.max(0, y), behavior: 'smooth'});
-  }, 80);
-
-  Promise.all([
-    API.call('getVehicle', {id: v.id}),
-    API.call('getAuditReport', {centerId: v.center_id})
-  ]).then(function(results){
-    var vDetail = results[0].success ? results[0].data : v;
-    var auditData = results[1].success ? results[1].data || [] : [];
-    curAudit = auditData.find(function(a){ return a.vehicleId === v.id; }) || null;
-    renderReport(vDetail, curAudit);
-  }).catch(function(){
-    document.getElementById('tl-hist').innerHTML =
-      '<div class="rpt-empty"><div class="rpt-empty-icon">❌</div>เกิดข้อผิดพลาด</div>';
-  });
+  setTimeout(function(){var el=document.getElementById('rpt-area');var topH=(document.querySelector('.topbar')||{offsetHeight:56}).offsetHeight;var y=el.getBoundingClientRect().top+window.pageYOffset-topH-12;window.scrollTo({top:Math.max(0,y),behavior:'smooth'});},80);
+  Promise.all([API.call('getVehicle',{id:v.id}),API.call('getAuditReport',{centerId:v.center_id})]).then(function(results){
+    var vDetail=results[0].success?results[0].data:v;
+    var auditData=results[1].success?results[1].data||[]:[]; 
+    curAudit=auditData.find(function(a){return a.vehicleId===v.id;})||null;
+    renderReport(vDetail,curAudit);
+  }).catch(function(){document.getElementById('tl-hist').innerHTML='<div class="rpt-empty"><div class="rpt-empty-icon">❌</div>เกิดข้อผิดพลาด</div>';});
 }
-
-/* ══ Render ══ */
-function renderReport(v, audit){
-  var items = audit ? audit.items || [] : [];
-  var ok    = items.filter(function(it){ return it.onTime === true; }).length;
-  var late  = items.filter(function(it){ return it.onTime === false; }).length;
-  var scored = ok + late;
-  var pct   = scored > 0 ? Math.round(ok/scored*100) : null;
-  var circumference = 2 * Math.PI * 24;
-
-  document.getElementById('rpt-plate').textContent  = v.plate_number;
-  document.getElementById('rpt-model').textContent  = (v.brand||'')+' '+(v.model||'')+(v.color?' · '+v.color:'');
-  document.getElementById('rpt-center').textContent = v.center_name||'';
-  document.getElementById('rpt-km-badge').innerHTML =
-    '<span style="font-size:12px;color:var(--t3)">🛣️ '
-    +Number(v.current_mileage||0).toLocaleString()+' กม. · รับรถ '+tDate(v.delivered_at)+'</span>';
-
-  // print title
-  document.getElementById('pt-title').textContent = 'รายงานการเข้ารับบริการ — '+v.plate_number;
-  document.getElementById('pt-sub').textContent   = (v.brand||'')+' '+(v.model||'')+' | '+(v.center_name||'')+' | พิมพ์: '+tDate(new Date().toISOString());
-
-  var arc = document.getElementById('rpt-donut-arc');
-  if(pct !== null){
-    var dashLen = (pct/100) * circumference;
-    arc.setAttribute('stroke-dasharray', dashLen+' '+(circumference-dashLen));
-    arc.setAttribute('stroke', pct>=80?'#06d6a0':pct>=50?'#ffd166':'#ff6b6b');
-    document.getElementById('rpt-pct').textContent = pct+'%';
-  } else {
-    arc.setAttribute('stroke-dasharray','0 '+circumference);
-    document.getElementById('rpt-pct').textContent = '—';
-  }
-
-  renderHistTab(v.serviceRecords||[], items);
-  renderPlanTab(items, v);
-  renderSumTab(items);
+function renderReport(v,audit){
+  var items=audit?audit.items||[]:[]; var ok=items.filter(function(it){return it.onTime===true;}).length; var late=items.filter(function(it){return it.onTime===false;}).length; var scored=ok+late; var pct=scored>0?Math.round(ok/scored*100):null; var circumference=2*Math.PI*24;
+  document.getElementById('rpt-plate').textContent=v.plate_number;
+  document.getElementById('rpt-model').textContent=(v.brand||'')+' '+(v.model||'')+' '+(v.color?'· '+v.color:'');
+  document.getElementById('rpt-center').textContent=v.center_name||''
+  document.getElementById('rpt-km-badge').innerHTML='<span style="font-size:12px;color:var(--t3)">🛣️ '+Number(v.current_mileage||0).toLocaleString()+' กม. · รับรถ '+tDate(v.delivered_at)+'</span>';
+  document.getElementById('pt-title').textContent='รายงานการเข้ารับบริการ — '+v.plate_number;
+  document.getElementById('pt-sub').textContent=(v.brand||'')+' '+(v.model||'')+' | '+(v.center_name||'')+' | พิมพ์: '+tDate(new Date().toISOString());
+  var arc=document.getElementById('rpt-donut-arc');
+  if(pct!==null){var dashLen=(pct/100)*circumference;arc.setAttribute('stroke-dasharray',dashLen+' '+(circumference-dashLen));arc.setAttribute('stroke',pct>=80?'#06d6a0':pct>=50?'#ffd166':'#ff6b6b');document.getElementById('rpt-pct').textContent=pct+'%';}
+  else{arc.setAttribute('stroke-dasharray','0 '+circumference);document.getElementById('rpt-pct').textContent='—';}
+  renderHistTab(v.serviceRecords||[],items); renderPlanTab(items,v); renderSumTab(items);
 }
-
-/* ══ Tab: ประวัติ ══ */
-function renderHistTab(records, auditItems){
-  var el = document.getElementById('tl-hist');
-  if(!records.length){
-    el.innerHTML = '<div class="rpt-empty"><div class="rpt-empty-icon">📋</div>ยังไม่มีประวัติการเข้ารับบริการ</div>';
-    return;
-  }
-  records.sort(function(a,b){ return new Date(b.serviced_at)-new Date(a.serviced_at); });
-
-  el.innerHTML = records.map(function(r){
-    var type  = r.maintenance_type || 'ROUTINE_10K';
-    var icon  = TYPE_ICON[type]  || '🔧';
-    var color = TYPE_COLOR[type] || 'var(--p600)';
-    var bg    = TYPE_BG[type]    || 'var(--p100)';
-    var label = TYPE_LABEL[type] || type;
-
-    // [FIX] ใช้ข้อมูล mileage_at_service ของ record นี้เพื่อเทียบกับ dueMileage ของ audit
-    var auditItem = auditItems.find(function(it){ return it.type === type; });
-    var badgeHtml = '';
-    if(auditItem && auditItem.lastService === r.serviced_at){
-      // เป็น service record ล่าสุดของ type นี้
-      if(auditItem.onTime === true)
-        badgeHtml = '<span class="tl-badge tl-badge-done">✅ ตามแผน</span>';
-      else if(auditItem.onTime === false){
-        var delay = [];
-        if(auditItem.delayDays>0) delay.push(auditItem.delayDays+' วัน');
-        if(auditItem.delayKm>0)   delay.push(auditItem.delayKm.toLocaleString()+' กม.');
-        badgeHtml = '<span class="tl-badge tl-badge-late">❌ ล่าช้า'+(delay.length?' ('+delay.join('/')+')':'')+'</span>';
-      } else {
-        badgeHtml = '<span class="tl-badge tl-badge-done">✅ เสร็จสิ้น</span>';
-      }
-    } else {
-      badgeHtml = '<span class="tl-badge tl-badge-done">✅ เสร็จสิ้น</span>';
-    }
-
-    var dateStr  = r.serviced_at ? r.serviced_at.split('T')[0] : '';
-    var tasksEsc = String(r.tasks||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    var notesEsc = String(r.notes||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    var canWrite = typeof Auth!=='undefined' && Auth.canWrite ? Auth.canWrite() : true;
-
-    return '<div class="tl-item">'
-      +'<div class="tl-left">'
-      +'<div class="tl-dot" style="background:'+bg+';color:'+color+'">'+icon+'</div>'
-      +'<div class="tl-line"></div>'
-      +'</div>'
-      +'<div class="tl-content">'
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">'
-      +'<div class="tl-date">'+tDate(r.serviced_at)+'</div>'
-      +(canWrite?'<div style="display:flex;gap:4px">'
-        +'<button onclick="openRptEdit(\''+r.id+'\',\''+type+'\',\''+dateStr+'\','+Number(r.mileage_at_service||0)+',\''+tasksEsc+'\',\''+notesEsc+'\')" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--t3);font-size:10px;padding:2px 7px;cursor:pointer">✏️ แก้</button>'
-        +'<button onclick="deleteRptRecord(\''+r.id+'\')" style="background:none;border:1px solid var(--danger);border-radius:6px;color:var(--danger);font-size:10px;padding:2px 7px;cursor:pointer">🗑️</button>'
-        +'</div>':'')
-      +'</div>'
-      +'<div class="tl-title">'+label+'</div>'
-      +'<div class="tl-row">'
-      +'<span class="tl-km">🛣️ '+Number(r.mileage_at_service||0).toLocaleString()+' กม.</span>'
-      +badgeHtml
-      +'</div>'
-      +(r.tasks?'<div class="tl-tasks">'+r.tasks+'</div>':'')
-      +'</div></div>';
+function renderHistTab(records,auditItems){
+  var el=document.getElementById('tl-hist');
+  if(!records.length){el.innerHTML='<div class="rpt-empty"><div class="rpt-empty-icon">📋</div>ยังไม่มีประวัติการเข้ารับบริการ</div>';return;}
+  records.sort(function(a,b){return new Date(b.serviced_at)-new Date(a.serviced_at);});
+  el.innerHTML=records.map(function(r){
+    var type=r.maintenance_type||'ROUTINE_10K'; var icon=TYPE_ICON[type]||'🔧'; var color=TYPE_COLOR[type]||'var(--p600)'; var bg=TYPE_BG[type]||'var(--p100)'; var label=TYPE_LABEL[type]||type;
+    var auditItem=auditItems.find(function(it){return it.type===type;}); var badgeHtml='';
+    if(auditItem&&auditItem.lastService===r.serviced_at){if(auditItem.onTime===true)badgeHtml='<span class="tl-badge tl-badge-done">✅ ตามแผน</span>';else if(auditItem.onTime===false){var delay=[];if(auditItem.delayDays>0)delay.push(auditItem.delayDays+' วัน');if(auditItem.delayKm>0)delay.push(auditItem.delayKm.toLocaleString()+' กม.');badgeHtml='<span class="tl-badge tl-badge-late">❌ ล่าช้า'+(delay.length?' ('+delay.join('/')+')':'')+'</span>';}else badgeHtml='<span class="tl-badge tl-badge-done">✅ เสร็จสิ้น</span>';}else badgeHtml='<span class="tl-badge tl-badge-done">✅ เสร็จสิ้น</span>';
+    var dateStr=r.serviced_at?r.serviced_at.split('T')[0]:''; var tasksEsc=String(r.tasks||'').replace(/\\/g,'\\\\').replace(/'/g,"\\\'"); var notesEsc=String(r.notes||'').replace(/\\/g,'\\\\').replace(/'/g,"\\\'");
+    var canWrite=typeof Auth!=='undefined'&&Auth.canWrite?Auth.canWrite():true;
+    return '<div class="tl-item"><div class="tl-left"><div class="tl-dot" style="background:'+bg+';color:'+color+'">'+icon+'</div><div class="tl-line"></div></div><div class="tl-content"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px"><div class="tl-date">'+tDate(r.serviced_at)+'</div>'+(canWrite?'<div style="display:flex;gap:4px"><button onclick="openRptEdit(\''+r.id+'\',\''+type+'\',\''+dateStr+'\','+Number(r.mileage_at_service||0)+',\''+tasksEsc+'\',\''+notesEsc+'\')" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--t3);font-size:10px;padding:2px 7px;cursor:pointer">✏️ แก้</button><button onclick="deleteRptRecord(\''+r.id+'\')" style="background:none;border:1px solid var(--danger);border-radius:6px;color:var(--danger);font-size:10px;padding:2px 7px;cursor:pointer">🗑️</button></div>':'')+'</div><div class="tl-title">'+label+'</div><div class="tl-row"><span class="tl-km">🛣️ '+Number(r.mileage_at_service||0).toLocaleString()+' กม.</span>'+badgeHtml+'</div>'+(r.tasks?'<div class="tl-tasks">'+r.tasks+'</div>':'')+'</div></div>';
   }).join('');
 }
-
-/* ══ Tab: แผนถัดไป ══ */
-function renderPlanTab(items, v){
-  var el = document.getElementById('plan-list');
-  if(!items.length){ el.innerHTML='<div class="rpt-empty">ไม่มีข้อมูล</div>'; return; }
-
-  var planned = items.filter(function(it){ return it.status !== 'COMPLETED'; });
-  planned.sort(function(a,b){
-    var p = {OVERDUE:0,DUE_SOON:1,APPOINTED:2,NORMAL:3};
-    return (p[a.status]||4)-(p[b.status]||4);
-  });
-
-  el.innerHTML = planned.map(function(it){
-    var icon  = TYPE_ICON[it.type]  || '🔧';
-    var color = TYPE_COLOR[it.type] || 'var(--p600)';
-    var bg    = TYPE_BG[it.type]    || 'var(--p100)';
-    var label = TYPE_LABEL[it.type] || it.type;
-
-    var statusBadge='', statusColor='var(--t3)';
-    if(it.status==='OVERDUE')        { statusBadge='❌ เกินกำหนด'; statusColor='var(--danger)'; }
-    else if(it.status==='DUE_SOON')  { statusBadge='⚠️ ใกล้ถึง';  statusColor='var(--warning)'; }
-    else if(it.status==='APPOINTED') { statusBadge='📅 นัดแล้ว';  statusColor='var(--p600)'; }
-    else                             { statusBadge='🟢 ปกติ';      statusColor='var(--success)'; }
-
-    // [FIX-MILEAGE] dueMileage ควรแสดงค่าจริงจาก Maintenance.gs
-    // ถ้า dueDate มีให้แสดง วันที่; ถ้า dueMileage มีให้แสดง กม.
-    var sub = [];
-    if(it.remainingDays!=null){
-      sub.push(it.remainingDays<0
-        ? 'เกิน '+Math.abs(it.remainingDays)+' วัน'
-        : 'อีก '+it.remainingDays+' วัน');
-    }
-    if(it.remainingKm!=null){
-      sub.push(it.remainingKm<0
-        ? 'เกิน '+Math.abs(it.remainingKm).toLocaleString()+' กม.'
-        : 'เหลือ '+it.remainingKm.toLocaleString()+' กม.');
-    }
-
-    return '<div class="plan-item">'
-      +'<div class="plan-icon" style="background:'+bg+';color:'+color+'">'+icon+'</div>'
-      +'<div class="plan-body">'
-      +'<div class="plan-title">'+label+'</div>'
-      +'<div class="plan-sub">'+(sub.join(' · ')||'—')+'</div>'
-      +'</div>'
-      +'<div class="plan-right">'
-      +'<div class="plan-due" style="color:'+statusColor+'">'+statusBadge+'</div>'
-      +(it.dueDate?'<div class="plan-km">📅 '+tDate(it.dueDate)+'</div>':'')
-      +(it.dueMileage?'<div class="plan-km">🛣️ '+Number(it.dueMileage).toLocaleString()+' กม.</div>':'')
-      +'</div>'
-      +'</div>';
+function renderPlanTab(items,v){
+  var el=document.getElementById('plan-list');
+  if(!items.length){el.innerHTML='<div class="rpt-empty">ไม่มีข้อมูล</div>';return;}
+  var planned=items.filter(function(it){return it.status!=='COMPLETED';});
+  planned.sort(function(a,b){var p={OVERDUE:0,DUE_SOON:1,APPOINTED:2,NORMAL:3};return(p[a.status]||4)-(p[b.status]||4);});
+  el.innerHTML=planned.map(function(it){
+    var icon=TYPE_ICON[it.type]||'🔧'; var color=TYPE_COLOR[it.type]||'var(--p600)'; var bg=TYPE_BG[it.type]||'var(--p100)'; var label=TYPE_LABEL[it.type]||it.type;
+    var statusBadge='',statusColor='var(--t3)';
+    if(it.status==='OVERDUE'){statusBadge='❌ เกินกำหนด';statusColor='var(--danger)';}else if(it.status==='DUE_SOON'){statusBadge='⚠️ ใกล้ถึง';statusColor='var(--warning)';}else if(it.status==='APPOINTED'){statusBadge='📅 นัดแล้ว';statusColor='var(--p600)';}else{statusBadge='🟢 ปกติ';statusColor='var(--success)';}
+    var sub=[];if(it.remainingDays!=null)sub.push(it.remainingDays<0?'เกิน '+Math.abs(it.remainingDays)+' วัน':'อีก '+it.remainingDays+' วัน');if(it.remainingKm!=null)sub.push(it.remainingKm<0?'เกิน '+Math.abs(it.remainingKm).toLocaleString()+' กม.':'เหลือ '+it.remainingKm.toLocaleString()+' กม.');
+    return '<div class="plan-item"><div class="plan-icon" style="background:'+bg+';color:'+color+'">'+icon+'</div><div class="plan-body"><div class="plan-title">'+label+'</div><div class="plan-sub">'+(sub.join(' · ')||'—')+'</div></div><div class="plan-right"><div class="plan-due" style="color:'+statusColor+'">'+statusBadge+'</div>'+(it.dueDate?'<div class="plan-km">📅 '+tDate(it.dueDate)+'</div>':'')+  (it.dueMileage?'<div class="plan-km">🛣️ '+Number(it.dueMileage).toLocaleString()+' กม.</div>':'')+'</div></div>';
   }).join('');
 }
-
-/* ══ Tab: สรุปรายการ ══ */
 function renderSumTab(items){
-  var el = document.getElementById('sum-list');
-  var types = ['INITIAL_1000KM','ROUTINE_10K','TIRE_ROTATION','TIRE_REPLACEMENT','BATTERY_REPLACEMENT'];
-  el.innerHTML = types.map(function(type){
-    var it = items.find(function(x){ return x.type===type; });
-    if(!it) return '';
-    var label = TYPE_LABEL[type];
-    var icon  = TYPE_ICON[type] || '🔧';
-
-    var badge='', badgeStyle='';
-    if(it.status==='COMPLETED'||it.onTime===true){
-      badge='ตามแผน'; badgeStyle='background:#EDFAF3;color:#1C8A45;border:1px solid #A3E4BF';
-    } else if(it.onTime===false){
-      badge='ล่าช้า'; badgeStyle='background:#FEF0EF;color:#E5322D;border:1px solid #FBCFCE';
-    } else if(it.status==='OVERDUE'){
-      badge='เกินกำหนด'; badgeStyle='background:#FEF0EF;color:#E5322D;border:1px solid #FBCFCE';
-    } else if(it.status==='DUE_SOON'){
-      badge='ใกล้ถึง'; badgeStyle='background:#FFF4E5;color:#C96F00;border:1px solid #FFD99B';
-    } else if(it.status==='APPOINTED'){
-      badge='นัดหมาย'; badgeStyle='background:#eef3ff;color:#3d5fc7;border:1px solid #c3d0f7';
-    } else {
-      badge='ปกติ'; badgeStyle='background:#EDFAF3;color:#1C8A45;border:1px solid #A3E4BF';
-    }
-
-    var lastSvc = it.lastService ? tDate(it.lastService) : 'ยังไม่เคย';
-    var nextDue = it.dueDate
-      ? tDate(it.dueDate)
-      : (it.dueMileage ? Number(it.dueMileage).toLocaleString()+' กม.' : '—');
-
-    return '<div class="sum-row">'
-      +'<div class="sum-icon">'+icon+'</div>'
-      +'<div style="flex:1;min-width:0">'
-      +'<div style="font-size:13px;font-weight:600;color:var(--t1)">'+label+'</div>'
-      +'<div style="font-size:11px;color:var(--t3);margin-top:2px">ล่าสุด: '+lastSvc+' · ถัดไป: '+nextDue+'</div>'
-      +'</div>'
-      +'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;'+badgeStyle+'">'+badge+'</span>'
-      +'</div>';
+  var el=document.getElementById('sum-list');
+  var types=['INITIAL_1000KM','ROUTINE_10K','TIRE_ROTATION','TIRE_REPLACEMENT','BATTERY_REPLACEMENT'];
+  el.innerHTML=types.map(function(type){
+    var it=items.find(function(x){return x.type===type;}); if(!it)return'';
+    var label=TYPE_LABEL[type]; var icon=TYPE_ICON[type]||'🔧';
+    var badge='',badgeStyle='';
+    if(it.status==='COMPLETED'||it.onTime===true){badge='ตามแผน';badgeStyle='background:#EDFAF3;color:#1C8A45;border:1px solid #A3E4BF';}
+    else if(it.onTime===false){badge='ล่าช้า';badgeStyle='background:#FEF0EF;color:#E5322D;border:1px solid #FBCFCE';}
+    else if(it.status==='OVERDUE'){badge='เกินกำหนด';badgeStyle='background:#FEF0EF;color:#E5322D;border:1px solid #FBCFCE';}
+    else if(it.status==='DUE_SOON'){badge='ใกล้ถึง';badgeStyle='background:#FFF4E5;color:#C96F00;border:1px solid #FFD99B';}
+    else if(it.status==='APPOINTED'){badge='นัดหมาย';badgeStyle='background:#eef3ff;color:#3d5fc7;border:1px solid #c3d0f7';}
+    else{badge='ปกติ';badgeStyle='background:#EDFAF3;color:#1C8A45;border:1px solid #A3E4BF';}
+    var lastSvc=it.lastService?tDate(it.lastService):'ยังไม่เคย'; var nextDue=it.dueDate?tDate(it.dueDate):(it.dueMileage?Number(it.dueMileage).toLocaleString()+' กม.':'—');
+    return '<div class="sum-row"><div class="sum-icon">'+icon+'</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--t1)">'+label+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px">ล่าสุด: '+lastSvc+' · ถัดไป: '+nextDue+'</div></div><span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;'+badgeStyle+'">'+badge+'</span></div>';
   }).join('');
 }
-
-/* ══ Tab switch ══ */
-function showRptTab(id, el){
-  ['hist','plan','sum'].forEach(function(t){
-    document.getElementById('tab-'+t).style.display = t===id ? 'block' : 'none';
-  });
-  document.querySelectorAll('.rpt-tab').forEach(function(t){ t.classList.remove('active'); });
-  el.classList.add('active');
-}
-
-/* ══ Export Excel ══ */
+function showRptTab(id,el){['hist','plan','sum'].forEach(function(t){document.getElementById('tab-'+t).style.display=t===id?'block':'none';});document.querySelectorAll('.rpt-tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');}
 function exportExcel(){
-  if(!curAudit || !curVehicle){ alert('กรุณาเลือกรถก่อน'); return; }
-  var rows=[
-    ['Intelligent Fleet SHE&En — รายงานการเข้ารับบริการ'],
-    ['รถ: '+curVehicle.plate_number+' '+curVehicle.brand+' '+curVehicle.model],
-    ['ศูนย์: '+(curVehicle.center_name||'')],
-    ['วันที่: '+tDate(new Date().toISOString())],
-    [],
-    ['ประเภทบำรุงรักษา','เข้ารับบริการล่าสุด','สถานะ','ล่าช้า(วัน)','ล่าช้า(กม.)','กำหนดถัดไป']
-  ];
-  (curAudit.items||[]).forEach(function(it){
-    var status = it.onTime===true?'ตามแผน':it.onTime===false?'ล่าช้า'
-      :(it.status==='DUE_SOON'?'ใกล้ถึง':it.status==='APPOINTED'?'นัดหมาย':'ยังไม่ทำ');
-    rows.push([
-      TYPE_LABEL[it.type]||it.type,
-      it.lastService ? tDate(it.lastService) : 'ยังไม่เคย',
-      status,
-      it.delayDays>0 ? it.delayDays : '',
-      it.delayKm>0   ? it.delayKm   : '',
-      it.dueDate ? tDate(it.dueDate) : (it.dueMileage ? Number(it.dueMileage).toLocaleString()+' กม.' : '')
-    ]);
-  });
-  var ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{wch:30},{wch:18},{wch:14},{wch:12},{wch:12},{wch:18}];
-  ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:5}},{s:{r:1,c:0},e:{r:1,c:5}},{s:{r:2,c:0},e:{r:2,c:5}},{s:{r:3,c:0},e:{r:3,c:5}}];
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, curVehicle.plate_number);
-  XLSX.writeFile(wb, 'fleet_'+curVehicle.plate_number+'_'+new Date().toISOString().split('T')[0]+'.xlsx');
+  if(!curAudit||!curVehicle){alert('กรุณาเลือกรถก่อน');return;}
+  var rows=[['Intelligent Fleet SHE&En — รายงานการเข้ารับบริการ'],['รถ: '+curVehicle.plate_number+' '+curVehicle.brand+' '+curVehicle.model],['ศูนย์: '+(curVehicle.center_name||'')\],['วันที่: '+tDate(new Date().toISOString())],[],['ประเภทบำรุงรักษา','เข้ารับบริการล่าสุด','สถานะ','ล่าช้า(วัน)','ล่าช้า(กม.)','กำหนดถัดไป']];
+  (curAudit.items||[]).forEach(function(it){var status=it.onTime===true?'ตามแผน':it.onTime===false?'ล่าช้า':(it.status==='DUE_SOON'?'ใกล้ถึง':it.status==='APPOINTED'?'นัดหมาย':'ยังไม่ทำ');rows.push([TYPE_LABEL[it.type]||it.type,it.lastService?tDate(it.lastService):'ยังไม่เคย',status,it.delayDays>0?it.delayDays:'',it.delayKm>0?it.delayKm:'',it.dueDate?tDate(it.dueDate):(it.dueMileage?Number(it.dueMileage).toLocaleString()+' กม.':'')\]);});
+  var ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:30},{wch:18},{wch:14},{wch:12},{wch:12},{wch:18}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:5}},{s:{r:1,c:0},e:{r:1,c:5}},{s:{r:2,c:0},e:{r:2,c:5}},{s:{r:3,c:0},e:{r:3,c:5}}];
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,curVehicle.plate_number);XLSX.writeFile(wb,'fleet_'+curVehicle.plate_number+'_'+new Date().toISOString().split('T')[0]+'.xlsx');
 }
-
-/* ══ Export PDF — พิมพ์ timeline ============ */
-function exportPDF(){
-  if(!curVehicle){ alert('กรุณาเลือกรถก่อน'); return; }
-  // switch ไป tab ประวัติก่อน print
-  showRptTab('hist', document.querySelectorAll('.rpt-tab')[0]);
-  var title = document.title;
-  document.title = 'รายงาน '+curVehicle.plate_number+' — '+tDate(new Date().toISOString());
-  window.print();
-  document.title = title;
-}
-
-/* ══ Modal แก้ไข/ลบ service record ══ */
-function openRptEdit(recordId, type, date, km, tasks, notes){
-  document.getElementById('rpt-modal-rid').value   = recordId;
-  document.getElementById('rpt-modal-type').value  = type;
-  document.getElementById('rpt-modal-date').value  = date;
-  document.getElementById('rpt-modal-km').value    = km;
-  document.getElementById('rpt-modal-tasks').value = tasks || '';
-  document.getElementById('rpt-modal-notes').value = notes || '';
-  var ov = document.getElementById('rpt-modal-overlay');
-  ov.style.display = 'flex';
-}
-
-function closeRptModal(){
-  document.getElementById('rpt-modal-overlay').style.display = 'none';
-}
-
+function exportPDF(){if(!curVehicle){alert('กรุณาเลือกรถก่อน');return;}showRptTab('hist',document.querySelectorAll('.rpt-tab')[0]);var title=document.title;document.title='รายงาน '+curVehicle.plate_number+' — '+tDate(new Date().toISOString());window.print();document.title=title;}
+function openRptEdit(recordId,type,date,km,tasks,notes){document.getElementById('rpt-modal-rid').value=recordId;document.getElementById('rpt-modal-type').value=type;document.getElementById('rpt-modal-date').value=date;document.getElementById('rpt-modal-km').value=km;document.getElementById('rpt-modal-tasks').value=tasks||'';document.getElementById('rpt-modal-notes').value=notes||'';document.getElementById('rpt-modal-overlay').style.display='flex';}
+function closeRptModal(){document.getElementById('rpt-modal-overlay').style.display='none';}
 function saveRptRecord(){
-  var recordId = document.getElementById('rpt-modal-rid').value;
-  var type     = document.getElementById('rpt-modal-type').value;
-  var date     = document.getElementById('rpt-modal-date').value;
-  var km       = parseInt(document.getElementById('rpt-modal-km').value) || 0;
-  var tasks    = document.getElementById('rpt-modal-tasks').value.trim();
-  var notes    = document.getElementById('rpt-modal-notes').value.trim();
-  if(!date){ alert('กรุณาเลือกวันที่'); return; }
-  if(!km){ alert('กรุณากรอกเลขไมล์'); return; }
-  API.post('updateServiceRecord',{
-    recordId: recordId, vehicleId: curVehicle ? curVehicle.id : '',
-    maintenanceType: type, servicedAt: date,
-    mileageAtService: km, tasks: tasks, notes: notes
-  }).then(function(r){
-    if(r.success){
-      localStorage.setItem('fleet-data-updated', Date.now());
-      closeRptModal();
-      if(curVehicle) selectVehicle(allVehicles.indexOf(curVehicle));
-    } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
-  });
+  var recordId=document.getElementById('rpt-modal-rid').value; var type=document.getElementById('rpt-modal-type').value; var date=document.getElementById('rpt-modal-date').value; var km=parseInt(document.getElementById('rpt-modal-km').value)||0; var tasks=document.getElementById('rpt-modal-tasks').value.trim(); var notes=document.getElementById('rpt-modal-notes').value.trim();
+  if(!date){alert('กรุณาเลือกวันที่');return;}if(!km){alert('กรุณากรอกเลขไมล์');return;}
+  API.post('updateServiceRecord',{recordId:recordId,vehicleId:curVehicle?curVehicle.id:'',maintenanceType:type,servicedAt:date,mileageAtService:km,tasks:tasks,notes:notes}).then(function(r){if(r.success){localStorage.setItem('fleet-data-updated',Date.now());closeRptModal();if(curVehicle)selectVehicle(allVehicles.indexOf(curVehicle));}else alert('เกิดข้อผิดพลาด: '+(r.error||''));});
 }
-
-function deleteRptRecord(recordId){
-  if(!confirm('ลบรายการนี้ใช่ไหม?')) return;
-  API.post('deleteServiceRecord',{recordId: recordId}).then(function(r){
-    if(r.success){
-      localStorage.setItem('fleet-data-updated', Date.now());
-      if(curVehicle) selectVehicle(allVehicles.indexOf(curVehicle));
-    } else { alert('เกิดข้อผิดพลาด: '+(r.error||'')); }
-  });
-}
-
-document.getElementById('rpt-modal-overlay').addEventListener('click', function(e){
-  if(e.target === this) closeRptModal();
-});
-
-function openSB(){ document.getElementById('sb').classList.add('open'); document.getElementById('ov').classList.add('show'); }
-function closeSB(){ document.getElementById('sb').classList.remove('open'); document.getElementById('ov').classList.remove('show'); }
+function deleteRptRecord(recordId){if(!confirm('ลบรายการนี้ใช่ไหม?'))return;API.post('deleteServiceRecord',{recordId:recordId}).then(function(r){if(r.success){localStorage.setItem('fleet-data-updated',Date.now());if(curVehicle)selectVehicle(allVehicles.indexOf(curVehicle));}else alert('เกิดข้อผิดพลาด: '+(r.error||''));});}
+document.getElementById('rpt-modal-overlay').addEventListener('click',function(e){if(e.target===this)closeRptModal();});
+function openSB(){document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show');}
+function closeSB(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show');}
 </script>
 </body>
 </html>
